@@ -1,0 +1,107 @@
+{
+  "part1": {
+    "params": {
+      "sigma_f": 0.3,
+      "sigma_c": 0.15,
+      "rho": 0.2,
+      "p_f": 0.03,
+      "p_c": 0.02,
+      "phi": 0.15,
+      "lam": 0.6,
+      "k": 1.0,
+      "a": 0.05
+    },
+    "method1": {
+      "method": "closed_form",
+      "d": 0.06477228176132034,
+      "h_f": 0.8212795619909623,
+      "h_c": 0.4475913734266104,
+      "R": 0.011517764398249536,
+      "Lambda": 0.7123685250165769
+    },
+    "method2": {
+      "method": "numeric",
+      "d": 0.06477228060655765,
+      "h_f": 0.8212795616155785,
+      "h_c": 0.44759136462914745,
+      "R": 0.011517764661049992,
+      "Lambda": 0.712368525665979,
+      "Pi": 0.042004879588358926
+    },
+    "solver_agreement": {
+      "d": 1.1547626882491002e-09,
+      "h_f": 3.7538383512725204e-10,
+      "h_c": 8.797462924814425e-09
+    },
+    "comparative_statics": {
+      "lambda": {
+        "dhf": 0.2443071233697067,
+        "dd": -0.06492554558001414,
+        "dd_condition_phi_minus_lam_emkd": -0.41236852501657684,
+        "dd_condition_predicts_positive": false
+      },
+      "a": {
+        "dhf": 0.18989195890169597,
+        "dd": -1.345910158458663
+      },
+      "rho": {
+        "dhf": 0.25780402972418465,
+        "dd": -0.05191526340523404,
+        "analytic_sign_positive": true
+      },
+      "p_f": {
+        "dhf": -8.330469297528905,
+        "dd": 1.4658427315320408
+      },
+      "sigma_f": {
+        "dhf": 1.4287817553557247,
+        "dd": -0.1465842766926043
+      }
+    },
+    "sign_checks": {
+      "dhf_dlambda>0": "True",
+      "dd_dlambda_matches_boundary": true,
+      "dhf_da>0": "True",
+      "dd_da<0": true,
+      "dhf_dpf<0": "True",
+      "dhf_dsigmaf>0": "True",
+      "dhf_drho_matches_analytic": "True"
+    },
+    "all_signs_pass": true,
+    "solvers_agree": "True"
+  },
+  "part2": {
+    "true_att": 0.06214046165411863,
+    "beta_twfe": 0.054933790015202856,
+    "att_callaway_santanna": 0.06219483349514857,
+    "cs_minus_true": 5.437184102994458e-05,
+    "twfe_minus_true": -0.007206671638915772,
+    "twfe_bias_vs_cs": -0.007261043479945717,
+    "event_study": {
+      "-3": 0.0002529208139597373,
+      "-2": -0.00028888046143833853,
+      "0": 0.026193109536460032,
+      "1": 0.05184906497744588,
+      "2": 0.07789561686603075,
+      "3": 0.07703653678818966,
+      "4": 0.07723452811993399
+    },
+    "pretrend_max_abs": 0.00028888046143833853,
+    "H1_hedging_att_positive": true,
+    "H2_adoption_att_positive": true,
+    "beta_adoption": 0.7059872390395946,
+    "H3_carbon_stronger": true,
+    "att_carbon": 0.07167844454699203,
+    "att_noncarbon": 0.051801652051190736,
+    "Hsub": {
+      "exogenous_naive": 0.13914896011883315,
+      "exogenous_controlled": 0.16988356195753337,
+      "confounded_naive": -1.7082325699082201,
+      "confounded_controlled": 0.16988356195753376,
+      "note": "Structural dh_f/da>0 shows up as a positive cross-sectional slope when a is exogenous. The capability confound turns the naive slope negative; controlling for (residualizing on) capability restores +.",
+      "exogenous_positive": true,
+      "confound_flips_naive": true,
+      "control_restores_positive": true
+    }
+  }
+}
