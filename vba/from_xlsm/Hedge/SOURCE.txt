@@ -1,0 +1,9 @@
+Source workbook (absolute): /Users/elijahjasper/Desktop/Modeling/Delta_Simulation/Hedge.xlsm
+Source workbook (name): Hedge.xlsm
+Extracted with: oletools.olevba
+NOTE: This is the VBA embedded inside the .xlsm, NOT the loose files under Bas/ or paper_companion/.
+Modules: 4
+  CFH_Accounting_revised.bas  (30949 bytes)
+  Calibration_revised.bas  (15510 bytes)
+  DeltaHedging_revised.bas  (73113 bytes)
+  PaperVerification_revised.bas  (98578 bytes)
