@@ -1,0 +1,65 @@
+# OS / editor
+.DS_Store
+Thumbs.db
+*~
+~$*
+*.tmp
+.vscode/
+.idea/
+
+# Excel lock / large workbooks (local only; VBA extracted under vba/)
+*.xlsm
+*.xlsb
+*.xlsx
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+.env
+
+# LaTeX build junk
+*.aux
+*.log
+*.out
+*.toc
+*.synctex.gz
+*.fls
+*.fdb_latexmk
+*.bbl
+*.blg
+
+# Large / regenerable binaries
+*.npz
+*.zip
+pl_paths.npz
+opt_grids.npz
+CORPCODE.xml
+corpCode.zip
+
+# Legacy working trees (sources live under papers/ python/ vba/ data/ docs/)
+/Bas/
+/_backups_20260710/
+/_extract_vba/
+/Ratio_Optimization/
+/Delta_Simulation/
+/Hedge_Simulation/
+/ESG_Disclosure_Hedging/
+/VBA_Modules.md
+/ANALYSIS_PYTHON.md
+/make_figures.py
+/changelog_*.md
+/twi asset jump diffusion.pdf
+/OPEN_ISSUES.md
+/supplementary_calibration_table.md
+*.bak
+*_prev.png
+*_prev.pdf
+.backup*/
+figures/.backup*/
+
+# Secrets / API keys
+.env
+**/opendart_key*
+**/API_KEY*
