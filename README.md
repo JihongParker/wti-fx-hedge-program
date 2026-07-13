@@ -19,8 +19,8 @@ Shared calibration snapshot: [`docs/supplementary_calibration_table.md`](docs/su
 papers/          PDF + TeX + figures used in each paper
 python/          Reproduction / figure / engine scripts (paper-driving pass)
 vba/             Excel VBA for demo & audit
-  production_from_xlsm/   modules extracted from live .xlsm (oletools)
-  paper_companion/        corrected companion modules aligned to rewritten papers
+  from_xlsm/              modules extracted from live .xlsm (oletools) — workbook truth
+  paper_companion/        corrected modules aligned to rewritten papers (NOT xlsm)
 data/results/    Small JSON result dumps (not full path banks)
 docs/            Calibration table, analysis notes, open issues
 ```
@@ -52,56 +52,22 @@ Numbers that rewrote the papers after the VBA audit are documented in [`docs/ANA
 
 ## VBA
 
-**Do not use the historical `Bas/` folder** (left out of this repo). It is not the latest.
+**Loose `Bas/*.bas` is not production.** Those files often **differ a lot** from what is embedded in `.xlsm`. This repo only ships:
 
-| Location | What it is |
-|----------|------------|
-| `vba/production_from_xlsm/` | Extracted with `oletools.olevba` from the production workbooks |
-| `vba/paper_companion/` | Drop-in / corrected modules that match the **rewritten** paper text |
+1. **`vba/from_xlsm/<Workbook>/`** — `oletools.olevba` extract of each workbook’s `vbaProject.bin`, **byte-checked** against a fresh extract.
+2. **`vba/paper_companion/`** — intentionally different modules written to match **rewritten paper prose** (not the shipped engines).
 
-### Production extraction (verified)
+| Folder | Source workbook | Flagship |
+|--------|-----------------|----------|
+| `from_xlsm/Ratio_Optimization/` | `Ratio_Optimization.xlsm` | `Ratio_Optimization.bas` |
+| `from_xlsm/Hedge/` | `Delta_Simulation/Hedge.xlsm` | `DeltaHedging_revised.bas`, older CFH |
+| `from_xlsm/Hedge_복사본/` | `Hedge 복사본.xlsm` | **CFH PRODUCTION v3.1** (~46 KB) |
 
-| Workbook (local) | Notable modules |
-|------------------|-----------------|
-| `Ratio_Optimization.xlsm` | `Ratio_Optimization.bas`, shared `Calibration_revised`, `DeltaHedging_revised`, `PaperVerification_revised`, older CFH |
-| `Delta_Simulation/Hedge.xlsm` | Same shared library (byte-identical calib/delta/verification) |
-| `Hedge_Simulation/Hedge 복사본.xlsm` | **Latest CFH**: `CFH_Accounting_revised` PRODUCTION **v3.1** (~1068 lines) |
+Shared module *names* are not always byte-identical across workbooks — use the folder for the workbook you mean.
 
-Stored here as:
+Paper companions (`Ratio_Optimization_v3`, `CFH_Accounting_forwards_v4`, `Calibration_asymmetric_v3`) document fixes in `docs/ANALYSIS_PYTHON.md` (e.g. production Structure B is still options, not forwards).
 
-- `vba/production_from_xlsm/CFH_Accounting_revised_v3.1.bas` ← from 복사본 (newest)
-- `vba/production_from_xlsm/CFH_Accounting_revised_workbook.bas` ← from `Hedge.xlsm` (older)
-- `vba/production_from_xlsm/Ratio_Optimization.bas` ← as embedded in workbook
-- `vba/production_from_xlsm/DeltaHedging_revised.bas`
-- `vba/production_from_xlsm/Calibration_revised.bas`
-- `vba/production_from_xlsm/PaperVerification_revised.bas`
-
-### Paper companion (aligned to prose)
-
-| Module | Role |
-|--------|------|
-| `Ratio_Optimization_v3.bas` | Standalone KO premium + mixed vanilla/KO (fixes Shapley misuse) |
-| `CFH_Accounting_forwards_v4.bas` | Structure B as **genuine forwards** (production still priced options) |
-| `Calibration_asymmetric_v3.bas` | Asymmetric up/down jump EM (paper § calibration) |
-
-Re-extract from a local `.xlsm` if needed:
-
-```bash
-python3 - <<'PY'
-from oletools.olevba import VBA_Parser
-import sys, os
-path, outdir = sys.argv[1], sys.argv[2]
-os.makedirs(outdir, exist_ok=True)
-vp = VBA_Parser(path)
-for _, _, name, code in vp.extract_macros():
-    if name and name.endswith('.bas'):
-        open(os.path.join(outdir, name), 'w', encoding='utf-8').write(code)
-        print('wrote', name)
-vp.close()
-PY
-# usage: python3 extract.py /path/to/Hedge.xlsm ./out_vba
-```
-
+Details: [`vba/README.md`](vba/README.md) · [`vba/from_xlsm/MANIFEST.md`](vba/from_xlsm/MANIFEST.md)
 ---
 
 ## Papers only
