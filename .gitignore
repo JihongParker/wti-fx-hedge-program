@@ -39,20 +39,12 @@ CORPCODE.xml
 corpCode.zip
 
 # Legacy working trees (sources live under papers/ python/ vba/ data/ docs/)
-/Bas/
-/_backups_20260710/
-/_extract_vba/
 /Ratio_Optimization/
 /Delta_Simulation/
 /Hedge_Simulation/
 /ESG_Disclosure_Hedging/
-/VBA_Modules.md
-/ANALYSIS_PYTHON.md
-/make_figures.py
-/changelog_*.md
-/twi asset jump diffusion.pdf
-/OPEN_ISSUES.md
-/supplementary_calibration_table.md
+/KIKO_Note/
+/_archive/
 *.bak
 *_prev.png
 *_prev.pdf
