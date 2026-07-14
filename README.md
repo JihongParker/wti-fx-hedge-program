@@ -9,6 +9,7 @@ Four companion working papers on one economic position: a Korean crude-oil impor
 | 3 | IFRS 9 cash-flow-hedge accounting (combined vs split) | [`papers/03_ifrs9_cfh/`](papers/03_ifrs9_cfh/) |
 | 4 | ESG disclosure, hedging & DiD design (Korea / KSSB) | [`papers/04_esg_disclosure/`](papers/04_esg_disclosure/) |
 | 5 | KIKO through the program — applied note on the 2008 knock-in knock-out episode | [`papers/05_kiko_note/`](papers/05_kiko_note/) |
+| 6 | The benign and the lethal barrier — double-KO hedge vs KIKO, same calibration | [`papers/06_kiko_comparison/`](papers/06_kiko_comparison/) |
 
 Shared calibration snapshot: [`docs/supplementary_calibration_table.md`](docs/supplementary_calibration_table.md).
 
