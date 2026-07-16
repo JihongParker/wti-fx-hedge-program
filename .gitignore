@@ -55,3 +55,4 @@ figures/.backup*/
 .env
 **/opendart_key*
 **/API_KEY*
+data/backtest/*.csv
