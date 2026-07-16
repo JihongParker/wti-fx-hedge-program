@@ -178,6 +178,10 @@ out = {
     "summary": summary,
     "paths": {name: cum_path(name) for name in results},
     "rolling": roll,
+    # raw monthly returns so the ERP can re-run the walk-forward engine live as
+    # the user drags the window / budget / cost sliders (4dp keeps the JSON small)
+    "returns": [{"m": rmonths[i], "o": round(float(r_oil[i]), 4), "f": round(float(r_fx[i]), 4)}
+                for i in range(T)],
 }
 OUT.write_text(json.dumps(out, indent=1))
 
