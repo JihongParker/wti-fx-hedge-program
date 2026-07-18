@@ -1,7 +1,7 @@
 """
 esg_hedge_engine.py
 ===================================================================
-Engine for "Does Mandatory ESG Disclosure Change Corporate Hedging?"
+Engine for "Mandatory ESG Disclosure and Corporate Hedging"
 (Park, 2026d -- the fourth paper of the program).
 
 This engine does NOT touch OpenDART/XBRL (that is the paper's stated
