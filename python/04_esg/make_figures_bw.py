@@ -26,6 +26,8 @@ from esg_hedge_engine import Params, solve_closed_form
 
 # ---- global black-and-white style -----------------------------------
 plt.rcParams.update({
+    # match the manuscript: Computer Modern math, serif text (no sans)
+    "font.family": "serif", "mathtext.fontset": "cm",
     "font.size": 10, "axes.titlesize": 10, "axes.labelsize": 10,
     "axes.edgecolor": "black", "axes.linewidth": 0.8,
     "figure.facecolor": "white", "savefig.facecolor": "white",
@@ -209,7 +211,10 @@ def _save(fig, name):
 def main():
     res = json.load(open("engine_results.json"))
     deriv = json.load(open("derivatives_parsed.json"))
-    panel = json.load(open("real_panel.json"))
+    try:  # kept for interface compatibility; fig_real_data doesn't read it
+        panel = json.load(open("real_panel.json"))
+    except FileNotFoundError:
+        panel = None
     fig_model_verification(res["part1"])
     fig_did_recovery(res["part2"])
     fig_hsub(res["part2"])
