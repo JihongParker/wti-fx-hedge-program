@@ -114,12 +114,12 @@
     "bias_am_as": -28566071099.521038
   },
   "girsanov": {
-    "reweighted_mean": 5522.8383551187435,
-    "reweighted_std": 15333.180925854884,
-    "direct_mean": 5007.927025137421,
-    "direct_std": 11711.72154940652,
-    "residual_mean": 514.9113299813225,
-    "residual_pct": 0.10281925583114762
+    "reweighted_mean": 6224.31,
+    "reweighted_std": 14346.47,
+    "direct_mean": 6217.66,
+    "direct_std": 12782.3,
+    "residual_mean": 6.65,
+    "residual_pct": 0.0010695341977528525
   },
   "driftbias": [
     [
