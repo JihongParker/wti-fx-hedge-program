@@ -72,6 +72,7 @@ def price(K=None, npaths=50_000, seed=12345, **over):
             v1 = S1[m, i].astype(float)/K
             v2 = S2[m, i].astype(float)/c['S2_0']
             X = np.column_stack([v1, v2, v1*v1, v2*v2, v1*v2, np.ones_like(v1)])
+            X = np.nan_to_num(X, posinf=0.0, neginf=0.0)
             beta, *_ = np.linalg.lstsq(X, CF[m], rcond=1e-10)
             cont = X @ beta
             intr = (S1[m, i].astype(float)-K)*S2[m, i]
