@@ -158,7 +158,9 @@ Because every downstream engine in this paper (Sections~\ref{sec:sde}---\ref{sec
 \end{align}
 The three lines match, in order, the total arrival rate, the intensity-weighted mean (preserving the compensator $\lambda\kappa$ of Section~\ref{sec:sde}), and the pooled second moment, an exact two-to-one variance decomposition.
 
-Table~\ref{tab:asymjump} reports the fitted regimes directly, and not only the symmetrized pair the downstream engines consume. Down-jumps arrive nearly twice as often as up-jumps ($\lambda_{dn}=4.462$ vs.\ $\lambda_{up}=2.328$ per year), are roughly $9\%$ larger in magnitude ($|\theta_{J,dn}|=8.75\%$ vs.\ $\theta_{J,up}=8.04\%$), and are 66\% more volatile ($\delta_{J,dn}=2.78\%$ vs.\ $\delta_{J,up}=1.68\%$). The asymmetry the EM step is designed to isolate is a measured property of the 1,299-day return history ($n_{up}=12$, $n_{dn}=23$ classified jump days).
+Table~\ref{tab:asymjump} reports the fitted regimes directly, and not only the symmetrized pair the downstream engines consume. Down-jumps arrive nearly twice as often as up-jumps ($\lambda_{dn}=4.462$ vs.\ $\lambda_{up}=2.328$ per year), are roughly $9\%$ larger in magnitude ($|\theta_{J,dn}|=8.75\%$ vs.\ $\theta_{J,up}=8.04\%$), and are 66\% more volatile ($\delta_{J,dn}=2.78\%$ vs.\ $\delta_{J,up}=1.68\%$). The asymmetry is a measured property of the return history ($n_{up}=12$, $n_{dn}=23$ classified jump days).
+
+A note on what this estimator is, because the paper's earlier drafts described it loosely. Jump days are identified by a $k$-sigma threshold rule and the intensity is their annualised count: $35\times252/1300=6.7846$ per year reproduces the figure the engines use to seven digits, and the two regime intensities are $12\times252/1300$ and $23\times252/1300$. It is a threshold classifier followed by moment-matching within each regime, not the likelihood-maximising mixture that ``EM'' would imply, and the symmetrized triple $(\lambda,\theta_J,\delta_J)=(6.7846,-0.0299,0.08443)$ is what every engine in this paper consumes. Re-deriving the symmetrization from the rounded regime values displayed above returns $\delta_J=0.0834$ rather than $0.08443$, a $1.2\%$ difference that is an artifact of the rounding rather than a second estimate. The estimation sample is the 1{,}300 paired returns of the price history; the figure of 1{,}299 quoted elsewhere in this paper and its companion differs by one observation and moves $\sigma_1$, $\sigma_2$ and $\rho$ in the fifth decimal place.
 
 \begin{table}[h]
 \centering
@@ -170,7 +172,7 @@ Regime & $\lambda$ (jumps/yr) & $\theta_J$ & $\delta_J$ & $n$ days \\
 Up-jump ($r>0$)   & 2.328 & $+8.04\%$ & $1.68\%$ & 12 \\
 Down-jump ($r<0$) & 4.462 & $-8.75\%$ & $2.78\%$ & 23 \\
 \midrule
-Symmetrized (moment-matched, Eqs.\ above) & 6.7846 & $-2.99\%$ & $8.34\%$ & 35 \\
+Symmetrized (as used by the engines) & 6.7846 & $-2.99\%$ & $8.443\%$ & 35 \\
 \bottomrule
 \end{tabular}
 \caption{Fitted up/down jump regimes and their moment-matched symmetrization, from the 1,299-day WTI daily log-return history (k=3 robust threshold).}
@@ -326,7 +328,7 @@ Black-76 proxy & $-23.02$bn & $57.23$bn \\
 \end{tabular}
 \end{center}
 
-\noindent The means are within $0.7\%$ of each other and the standard deviations differ by a factor of $1.12$, not the $15.8\times$ and $2.16\times$ of Table~\ref{tab:hedgecost}. The residual is attributable to the contract: terminating the ledger at the LSMC exercise time on roughly $45\%$ of paths shortens the hedging horizon on exactly those paths, and hedging error accumulates with the length of the hedge.
+\noindent The means are within $0.7\%$ of each other and the standard deviations differ by a factor of $1.12$, not the $15.8\times$ and $2.16\times$ of Table~\ref{tab:hedgecost}. That $1.12$ is small but it is not noise: repeated over five independent surface-and-hedge seed pairs the ratio is $1.1156$ with a standard deviation of $0.0040$ across seeds, so it stands at $65$ standard errors from unity. The residual is attributable to the contract: terminating the ledger at the LSMC exercise time on roughly $45\%$ of paths shortens the hedging horizon on exactly those paths, and hedging error accumulates with the length of the hedge.
 
 This changes what the paper is entitled to claim, and the abstract and Discussion have been rewritten accordingly. The defensible statement is that a barrier-aware regression delta reduces hedge-cost dispersion by roughly $12\%$ relative to a barrier-blind Black-76 delta on an identical ledger, and that the much larger raw gap in Table~\ref{tab:hedgecost} is dominated by payoff, premium and stopping-time differences between the three engines rather than by delta quality. The trimodality of Section~\ref{sec:pldist} is a property of the proxy ledgers as configured and inherits the same caveat.
 
@@ -580,7 +582,7 @@ $k$ & $\lambda$ (per year) & Base premium & KO rate & Mean total P\&L & Std.\ to
 \label{fig:lambdarob}
 \end{figure}
 
-The fitted jump intensity is highly sensitive to $k$: a looser threshold ($k=2.5$) classifies more than four times the jump frequency of a tighter one ($k=3.5$), $15.7$ versus $3.7$ jumps per year, as diffusive moves get reclassified as jumps. Despite this range in fitted $\lambda$, the base premium moves by under $1\%$ and the KO rate stays essentially flat ($0.171$---$0.174$), because the EM-style calibration re-solves the diffusive volatility to compensate for whatever variance the threshold assigns to jumps instead, total variance is conserved across the split, and price and barrier behavior inherit that conservation. The $k=3.0$ row's $\lambda=6.7898$ reproduces the production baseline's own EM-fitted $\lambda=6.7846$ (Section~\ref{sec:calibration}) to four significant figures, two independently-converging calibration methods landing on the same intensity.
+The fitted jump intensity is highly sensitive to $k$: a looser threshold ($k=2.5$) classifies more than four times the jump frequency of a tighter one ($k=3.5$), $15.7$ versus $3.7$ jumps per year, as diffusive moves get reclassified as jumps. Despite this range in fitted $\lambda$, the base premium moves by under $1\%$ and the KO rate stays essentially flat ($0.171$---$0.174$), because the EM-style calibration re-solves the diffusive volatility to compensate for whatever variance the threshold assigns to jumps instead, total variance is conserved across the split, and price and barrier behavior inherit that conservation. The $k=3.0$ row's $\lambda=6.7898$ and the production baseline's $\lambda=6.7846$ are the same threshold-count estimator evaluated on samples differing by one observation, $35\times252/1299$ against $35\times252/1300$. They are not two independent methods, and their agreement is arithmetic rather than evidential; the informative content of this sweep is the variation \emph{across} $k$, not the agreement at $k=3$.
 
 \section{Model Validation and Robustness}
 \label{sec:pqval}
