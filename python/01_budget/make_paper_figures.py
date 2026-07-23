@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from mpl_toolkits.mplot3d import proj3d  # noqa
 
 plt.rcParams.update({
@@ -188,13 +189,14 @@ for k, (title, s1, costf, res) in enumerate(ENG):
     nb = res['no_budget']
     ax.axhline(nb['gmvp'], color='0.45', ls=':', lw=1.0)
     ax.text(0.97, 0.90, 'budget cap = 45 (dashed)\n'
-            f"unconstrained floor $\\sigma_{{res}}$ = {nb['gmvp']:.5f} (dotted),\n"
+            f"unconstrained floor $\\sigma_{{res}}$ = {nb['gmvp']:.4f} (dotted),\n"
             f"reached at budget = {nb['cost']/1e9:.2f} bn",
             transform=ax.transAxes, ha='right', va='top', fontsize=7.5, color='0.15')
     ax.set_xlabel('Budget $B$ (bn KRW)')
     ax.set_ylabel(r'optimal $\sigma_{res}(B)$')
     ax.set_title(title, fontsize=10)
     ax.ticklabel_format(axis='y', useOffset=False)
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
 fig.suptitle('Budget relaxation: the risk-minimizing residual volatility as a function of the budget cap',
              fontsize=10)
 fig.tight_layout(rect=[0, 0, 1, 0.92])
@@ -205,7 +207,9 @@ savefig(fig, 'fig_budget_sweep.pdf')
 # =====================================================================
 V2 = json.load(open('v2_curve.json'))
 PM = V2['pm']                       # stress-conditional pKO (MC measured)
-PSTAR = V2['pstar']
+PSTAR = V2['pstar']                 # Sec.8: pure-KO dies, standalone KO price
+PSTAR_S7 = V2['pstar_shapley']      # Sec.7 eq. pstar: pure-KO dies, Shapley-priced quanto
+PK = 17377.11 * I['Monthly_Oil_Need']   # standalone LSMC KO premium (Sec.8)
 PCROSS = V2['pcross']
 PFLOOR = V2['pfloor']
 SIGV = V2['sigV']
@@ -219,7 +223,7 @@ adopted = (K1A*rmA['w1'] + K2A*rmA['w2']
 # budget-pinned at exactly B
 w1f, w2f = 0.945202, 0.054798
 mixed = np.where(p < PFLOOR,
-                 (K1A*w1f + K2E*w2f + (1-w1f*(1-p))*M1 + (1-w2f)*M2)/1e9,
+                 (PK*w1f + K2E*w2f + (1-w1f*(1-p))*M1 + (1-w2f)*M2)/1e9,
                  B/1e9)
 
 fig, ax = plt.subplots(figsize=(7.2, 4.2))
@@ -231,8 +235,8 @@ ax.plot(p, mixed, color='black', lw=2.0, ls='-.',
         label='mixed vanilla/KO program optimum')
 ax.axhline(B/1e9, color='black', lw=0.8, ls=':')
 ax.text(0.012, B/1e9 + 2.5, 'budget cap = 45 bn', fontsize=8, color='0.15')
-ax.axvline(PSTAR, color='0.45', lw=0.9, ls='-.')
-ax.text(PSTAR + 0.008, 100, f'$p^*={PSTAR:.3f}$\n(pure KO dies)', fontsize=7.5, color='0.15')
+ax.axvline(PSTAR_S7, color='0.45', lw=0.9, ls='-.')
+ax.text(PSTAR_S7 + 0.008, 100, f'$p^*={PSTAR_S7:.4f}$\n(pure KO dies)', fontsize=7.5, color='0.15')
 for pk, lab, dy in [(0.2309, 'unconditional KO rate\n(net of early exercise)', 16),
                     (0.4369, 'unconditional\nbarrier-touch rate', 16)]:
     ax.plot([pk], [np.interp(pk, p, adopted)], marker='o', ms=5, color='black')
@@ -261,7 +265,7 @@ pk = [a for a, b in cv]
 sk = [b for a, b in cv]
 ax.plot(pk, sk, color='0.45', lw=1.4, ls='--', label='all-KO branch (budget-feasible part)')
 ax.axhline(SIGV, color='0.45', lw=1.4, ls=':',
-           label='all-vanilla branch $\\sigma=%.7f$' % SIGV)
+           label='all-vanilla branch $\\sigma=%.4f$' % SIGV)
 # mixed = lower envelope
 pe = np.linspace(0, 0.15, 601)
 env = []
@@ -277,11 +281,13 @@ for x, lab, tx, ty in [
         (PSTAR, 'pure KO infeasible\n$p^*=%.4f$' % PSTAR, PSTAR + 0.0015, 0.09165)]:
     ax.axvline(x, color='0.6', lw=0.8, ls='-.')
     ax.text(tx, ty, lab, fontsize=7, color='0.15', va='top')
-ax.annotate('measured stress-conditional $p_{KO}=0.8405$\n'
+ax.annotate('measured stress-conditional $p_{KO}=0.8925$\n'
             '$\\Rightarrow$ deep in the all-vanilla regime $\\rightarrow$',
             xy=(0.149, SIGV), xytext=(0.085, 0.09085), fontsize=8, color='black')
 ax.set_xlim(0, 0.15)
 ax.set_ylim(0.0905, 0.0920)
+ax.yaxis.set_major_locator(MultipleLocator(0.0005))
+ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
 ax.set_xlabel('$p_{KO}$ (probability the KO structure is dead under stress)')
 ax.set_ylabel(r'optimal $\sigma_{res}$ of the mixed program')
 ax.set_title('Instrument choice inside the mixed program: the three regimes')

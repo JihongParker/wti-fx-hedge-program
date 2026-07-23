@@ -9,6 +9,7 @@ import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 from matplotlib import cm
+from matplotlib.ticker import FormatStrFormatter, MultipleLocator
 from mpl_toolkits.mplot3d import Axes3D  # noqa: F401
 
 plt.rcParams.update({
@@ -224,7 +225,7 @@ for k, (title, s1, costf, xl, res) in enumerate(ENG):
     nb = res['risk_min_no_budget']
     ax.axhline(nb['gmvp'], color='0.45', ls=':', lw=1.0)
     ax.text(0.97, 0.90, 'workbook budget = 45 (dashed)\n'
-            f"unconstrained floor $\\sigma_{{res}}$ = {nb['gmvp']:.5f} (dotted),\n"
+            f"unconstrained floor $\\sigma_{{res}}$ = {nb['gmvp']:.4f} (dotted),\n"
             f"reached at budget = {nb['budget_needed']/1e9:.2f} bn",
             transform=ax.transAxes, ha='right', va='top',
             fontsize=7.5, color='0.15')
@@ -232,6 +233,7 @@ for k, (title, s1, costf, xl, res) in enumerate(ENG):
     ax.set_ylabel(r'optimal $\sigma_{res}(B)$')
     ax.set_title(title, fontsize=10)
     ax.ticklabel_format(axis='y', useOffset=False)
+    ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
 fig.suptitle('Budget relaxation: the risk-minimizing residual volatility as a function of the budget cap',
              fontsize=10)
 fig.tight_layout(rect=[0, 0, 1, 0.92])
