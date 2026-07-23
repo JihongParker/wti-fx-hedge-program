@@ -90,7 +90,7 @@ with $C$ equal to \eqref{eq:costeu} or \eqref{eq:costam}. The allocation constra
 \section{Data and Calibration}
 \label{sec:data}
 
-Table \ref{tab:inputs} lists every input used in the paper. The risk inputs are computed from 1{,}299 paired daily log returns: $\sigma_1 = 0.3946$ (WTI, annualized) and $\sigma_2 = 0.0926$ (USD/KRW), with correlation $\rho = 0.0876$. The American regime's $\sigma_1 = 0.3242$ is the diffusive volatility from the expectation--maximization jump/diffusion decomposition of the same series. The stress scenario (WTI at 113 USD/bbl and USD/KRW at 1550) prices the unhedged fraction of each leg in \eqref{eq:costeu}--\eqref{eq:costam}.
+Table \ref{tab:inputs} lists every input used in the paper. The risk inputs are computed from 1{,}299 paired daily log returns: $\sigma_1 = 0.3946$ (WTI, annualized) and $\sigma_2 = 0.0926$ (USD/KRW), with correlation $\rho = 0.0876$. The American regime's $\sigma_1 = 0.3242$ is the diffusive volatility from the expectation--maximization jump/diffusion decomposition of the same series. The two closed-form legs are struck $5\%$ in the money, at $0.95\,S_{WTI}=74.99$ USD/bbl and $0.95\,S_{KRW}=1{,}463.61$ KRW/USD; the American structure is struck at the money, $K=S_{WTI}=78.94$, with knock-out barriers at 120 and 50 USD/bbl. The two regimes therefore price different strikes, which is worth holding in view wherever their cash ledgers are compared side by side. The stress scenario (WTI at 113 USD/bbl and USD/KRW at 1550) prices the unhedged fraction of each leg in \eqref{eq:costeu}--\eqref{eq:costam}.
 
 \begin{table}[h]
 \centering
@@ -105,6 +105,10 @@ Monthly oil need (bbl) & $Q_{oil}$ & 2{,}000{,}000 \\
 Monthly USD need & $Q_{USD}$ & 157{,}880{,}000 \\
 WACC (funding rate) & $r_w$ & 0.07 \\
 Budget (KRW) & $B$ & 45{,}000{,}000{,}000 \\
+European WTI call strike (USD/bbl) & $K_1 = 0.95\,S_{WTI}$ & 74.99 \\
+European FX call strike (KRW/USD) & $K_2 = 0.95\,S_{KRW}$ & 1{,}463.61 \\
+American call strike (USD/bbl) & $K = S_{WTI}$ & 78.94 \\
+Knock-out barriers (USD/bbl) & $U$, $L$ & 120, 50 \\
 WTI option maturity (yr) & $T_1$ & 0.833 \\
 FX option maturity (yr) & $T_2$ & 0.5 \\
 Stress WTI (USD/bbl) & $S^{st}_{WTI}$ & 113 \\
@@ -116,7 +120,7 @@ WTI--FX correlation & $\rho$ & 0.0876 \\
 Black-76 WTI call (USD/bbl) & $P_{B76}$ & 12.6524 \\
 Garman--Kohlhagen FX call (KRW/USD) & $P_{GK}$ & 84.667 \\
 LSMC Shapley WTI premium (KRW/bbl) & $P^{Sh}_{WTI}$ & 15{,}093.75 \\
-LSMC Shapley FX premium (KRW/USD) & $P^{Sh}_{FX}$ & 2{,}038.72 \\
+LSMC Shapley FX premium (KRW/bbl) & $P^{Sh}_{FX}$ & 2{,}038.72 \\
 \bottomrule
 \end{tabular}
 \caption{Model inputs. Every downstream number in this paper is computed from these values and nothing else.}

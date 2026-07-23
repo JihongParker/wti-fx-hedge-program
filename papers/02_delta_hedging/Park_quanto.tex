@@ -152,7 +152,7 @@ Symmetrized (moment-matched, Eqs.\ above) & 6.790 & $-2.99\%$ & $8.34\%$ & 35 \\
 \label{tab:asymjump}
 \end{table}
 
-The resulting decomposition: total historical WTI volatility $\sigma_1=0.39455$ splits into a diffusive $\sigma_1 = 0.32419$ and a symmetrized jump component $(\lambda,\theta_J,\delta_J)=(6.7846,\,-0.0299,\,0.0844)$. The negative mean jump size is the asymmetric fit's quantitative trace surviving symmetrization -- the larger, more frequent down-jump regime pulls $\theta_J$ negative under intensity weighting. The FX leg calibrates to $\sigma_2 = 0.09258$ with WTI--FX correlation $\rho = 0.0876$, the quantity the orthogonal Girsanov construction of Section~\ref{sec:girsanov} isolates. Whether the up/down asymmetry itself matters for barrier risk is testable: simulating the genuine two-regime process against the symmetrized draw on matched seeds moves barrier-touch probabilities by under $0.1$ percentage points even from starting points near the barrier -- the $32.4\%$ diffusive volatility dominates touch dynamics over sub-annual horizons, so the symmetrization is quantitatively adequate for this structure, not merely tractable.
+The resulting decomposition: total historical WTI volatility $\sigma_1=0.3946$ splits into a diffusive $\sigma_1 = 0.3242$ and a symmetrized jump component $(\lambda,\theta_J,\delta_J)=(6.7846,\,-0.0299,\,0.0844)$. The negative mean jump size is the asymmetric fit's quantitative trace surviving symmetrization -- the larger, more frequent down-jump regime pulls $\theta_J$ negative under intensity weighting. The FX leg calibrates to $\sigma_2 = 0.0926$ with WTI--FX correlation $\rho = 0.0876$, the quantity the orthogonal Girsanov construction of Section~\ref{sec:girsanov} isolates. Whether the up/down asymmetry itself matters for barrier risk is testable: simulating the genuine two-regime process against the symmetrized draw on matched seeds moves barrier-touch probabilities by under $0.1$ percentage points even from starting points near the barrier -- the $32.4\%$ diffusive volatility dominates touch dynamics over sub-annual horizons, so the symmetrization is quantitatively adequate for this structure, not merely tractable.
 
 \section{Numerical Model Formulation}
 \label{sec:numerical}
@@ -358,7 +358,7 @@ The gap is largest at inception ($18.6\%$) and shrinks monotonically to $5.6\%$ 
 \subsection{Hedge-Cost Sensitivity to the FX Coupling Multiplier}
 \label{sec:fxsweep}
 
-The one-parameter coupling $\delta_{FX}=c\cdot\delta_{WTI}$, evaluated at the natural reference point $c=1.0$, is tested directly by sweeping $c\in\{0.5,0.75,1.0,1.25,1.5\}$ and holding the WTI delta strategy fixed. Table \ref{tab:fxsweep} and Figure \ref{fig:fxsweep} report the results; note that the KO rate ($0.22485$) and early-exercise rate ($0.4551$) are, as expected, identical across every value of $c$, since $c$ only rescales the FX leg and has no influence on the WTI-side stopping decisions -- any change in cost or variance across the sweep is attributable purely to the FX-leg coupling, not to a change in the underlying barrier or exercise behavior.
+The one-parameter coupling $\delta_{FX}=c\cdot\delta_{WTI}$, evaluated at the natural reference point $c=1.0$, is tested directly by sweeping $c\in\{0.5,0.75,1.0,1.25,1.5\}$ and holding the WTI delta strategy fixed. Table \ref{tab:fxsweep} and Figure \ref{fig:fxsweep} report the results; note that the KO rate ($0.2249$) and early-exercise rate ($0.4551$) are, as expected, identical across every value of $c$, since $c$ only rescales the FX leg and has no influence on the WTI-side stopping decisions -- any change in cost or variance across the sweep is attributable purely to the FX-leg coupling, not to a change in the underlying barrier or exercise behavior.
 
 \begin{table}[h]
 \centering
@@ -408,7 +408,7 @@ c^\star = -\frac{\mathrm{Cov}(A,B)}{\mathrm{Var}[B]}, \qquad
 \end{equation}
 The swept range $[0.5,1.5]$ is simply the right arm of this parabola, which is why cost variance rises monotonically across it: the vertex lies to the \emph{left} of the entire tested window.
 
-Equation~\eqref{eq:hcaffine} is not an approximation but an identity forced by the engine, and a matched re-implementation confirms it holds to machine precision: a third run at $c=0.5$ reproduces $A_p+0.5\,B_p$ path by path with maximum relative error below $10^{-15}$. On that re-implementation at $n=200{,}000$ jump-adapted exact paths (Section~\ref{sec:rigor}; the same 217-step daily grid, WTI surface fitted by least-squares Monte Carlo on the full path bank), the minimizer is
+Equation~\eqref{eq:hcaffine} is not an approximation but an identity forced by the engine, and a matched re-implementation confirms it holds as an identity: a third run at $c=0.5$ reproduces $A_p+0.5\,B_p$ path by path with maximum relative error below $10^{-15}$. On that re-implementation at $n=200{,}000$ jump-adapted exact paths (Section~\ref{sec:rigor}; the same 217-step daily grid, WTI surface fitted by least-squares Monte Carlo on the full path bank), the minimizer is
 \begin{equation}
 c^\star = -0.548 \quad (\text{stable across hedge seeds at smaller } n,\ \text{range } [-0.56,\,-0.52]),
 \end{equation}
@@ -525,7 +525,7 @@ The simplest test of the orthogonal Girsanov construction (Section~\ref{sec:girs
 \end{tabular}
 \end{table}
 
-An identical result holds when instead sweeping the market-price-of-risk scaling factor from $0.5\times$ to $1.5\times$ the baseline $\mu^{\mathbb P}$, with simulated bias again matching the theoretical closed form to residuals on the order of $10^{-14}$. Both sweeps confirm the orthogonal Girsanov construction of Section~\ref{sec:girsanov} is implemented correctly at the level of raw drift moments: this is an exact test in the sense that no discretization error, path-dependent payoff, or barrier feature is involved, only the correctly-orthogonalized first-moment shift itself.
+An identical result holds when instead sweeping the market-price-of-risk scaling factor from $0.5\times$ to $1.5\times$ the baseline $\mu^{\mathbb P}$, with simulated bias again matching the theoretical closed form. Both sweeps confirm the orthogonal Girsanov construction of Section~\ref{sec:girsanov} is implemented correctly at the level of raw drift moments: this is an exact test in the sense that no discretization error, path-dependent payoff, or barrier feature is involved, only the correctly-orthogonalized first-moment shift itself.
 
 \subsection{Inexact Validation: Reweighting the Actual Barrier Payoff}
 \label{sec:inexactval}
@@ -598,7 +598,7 @@ The self-consistent jump risk premium is an Esscher tilt: $h$ maps $(\lambda,\th
 \subsubsection{What survives, and what changes, at 200{,}000 exact paths}
 \label{sec:rigor200k}
 
-On the exact engine at $200{,}000$ paths, the affine identity~\eqref{eq:hcaffine} holds to $6\times10^{-16}$, hedge-cost std at $c=1$ is KRW $51.90$bn (production: $54.41$bn, $-4.6\%$), and $c^\star=-0.548$ with std $48.76$bn ($-6.1\%$) -- sign and magnitude confirmed at $20\times$ the production sample with zero discretization error. Classical variance reduction fails structurally: the Merton-series quanto-European control variate (analytic mean $19{,}316.55$ vs.\ simulated $19{,}314.12$) gains only $\times1.01$, since KO'd paths zero the option payoff exactly where the control is largest; antithetic pairing gains $\times1.00$, the payoff being non-monotone in the shocks. Precision on this product is bought with paths.
+On the exact engine at $200{,}000$ paths, the affine identity~\eqref{eq:hcaffine} holds, hedge-cost std at $c=1$ is KRW $51.90$bn (production: $54.41$bn, $-4.6\%$), and $c^\star=-0.548$ with std $48.76$bn ($-6.1\%$) -- sign and magnitude confirmed at $20\times$ the production sample with zero discretization error. Classical variance reduction fails structurally: the Merton-series quanto-European control variate (analytic mean $19{,}316.55$ vs.\ simulated $19{,}314.12$) gains only $\times1.01$, since KO'd paths zero the option payoff exactly where the control is largest; antithetic pairing gains $\times1.00$, the payoff being non-monotone in the shocks. Precision on this product is bought with paths.
 
 \section{Discussion}
 \label{sec:discussion}
