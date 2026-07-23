@@ -48,15 +48,19 @@ def cost_eu(w):
 # American cost (Pricing!C11:C19) -- C15 transcribed exactly as stored,
 # i.e. 1 - w1*Need*max(...), NOT (1-w1)*Need*max(...)
 K1_AM = I['LSMC_WTI_shapley']*I['Monthly_Oil_Need']*np.exp(I['WACC']*I['Maturity_Oil'])
-K2_AM = I['LSMC_FX_shapley']*I['Monthly_USD_Need']*np.exp(I['Maturity_FX']*I['WACC'])
+K2_AM = I['LSMC_FX_shapley']*I['Monthly_Oil_Need']*np.exp(I['Maturity_FX']*I['WACC'])
 FXGAP = max(0.0, I['Stress_KRW']-I['KRW_spot'])
 
 def cost_am(w):
     w1, w2 = w
+    # eq:costam — both regimes share the stress ledger (M1_EU is the WTI
+    # spike loss, M2_EU the FX-gap loss). Earlier code had c15 = 1.0 - w1*...
+    # (an Excel-cell transcription slip using the FX gap for the WTI leg);
+    # the paper's stress term is (1-w1)*M1_EU, restored here.
     c11 = K1_AM*w1
     c12 = K2_AM*w2
-    c15 = 1.0 - w1*I['Monthly_Oil_Need']*FXGAP
-    c16 = (1-w2)*I['Monthly_USD_Need']*FXGAP
+    c15 = (1-w1)*M1_EU
+    c16 = (1-w2)*M2_EU
     return c11 + c12 + c15 + c16
 
 ENGINES = {
