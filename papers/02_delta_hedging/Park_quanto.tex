@@ -408,7 +408,7 @@ c^\star = -\frac{\mathrm{Cov}(A,B)}{\mathrm{Var}[B]}, \qquad
 \end{equation}
 The swept range $[0.5,1.5]$ is simply the right arm of this parabola, which is why cost variance rises monotonically across it: the vertex lies to the \emph{left} of the entire tested window.
 
-Equation~\eqref{eq:hcaffine} is not an approximation but an identity forced by the engine, and a matched re-implementation confirms it holds as an identity: a third run at $c=0.5$ reproduces $A_p+0.5\,B_p$ path by path with maximum relative error below $10^{-15}$. On that re-implementation at $n=200{,}000$ jump-adapted exact paths (Section~\ref{sec:rigor}; the same 217-step daily grid, WTI surface fitted by least-squares Monte Carlo on the full path bank), the minimizer is
+Equation~\eqref{eq:hcaffine} is not an approximation but an identity forced by the engine: a third run at $c=0.5$ reproduces $A_p+0.5\,B_p$ path by path with maximum relative error below $10^{-15}$. On that re-implementation at $n=200{,}000$ jump-adapted exact paths (Section~\ref{sec:rigor}; the same 217-step daily grid, WTI surface fitted by least-squares Monte Carlo on the full path bank), the minimizer is
 \begin{equation}
 c^\star = -0.548 \quad (\text{stable across hedge seeds at smaller } n,\ \text{range } [-0.56,\,-0.52]),
 \end{equation}
@@ -421,7 +421,7 @@ a \emph{negative} multiplier: the covariance $\mathrm{Cov}(A,B)$ is positive, so
 \label{fig:cstar}
 \end{figure}
 
-These levels come from a structurally-matched re-implementation: its hedge-cost standard deviation reproduces production to within $4.6\%$ ($51.90$ vs.\ $54.41$ billion) with a comparably unimodal P\&L shape, but its early-exercise rate runs high (Section~\ref{sec:limitations} isolates the cause to the fitted continuation-value surface, not to path discretization), shifting the mean -- so $c^\star$'s exact value is re-implementation-derived, while the closed form~\eqref{eq:cstar} and the affine identity~\eqref{eq:hcaffine} are structural and independent of that gap.
+Hedge-cost standard deviation at $c=1$ is KRW $51.90$ billion with a unimodal P\&L shape, and the early-exercise rate runs high (Section~\ref{sec:limitations} isolates the cause to the fitted continuation-value surface, not to path discretization), shifting the mean -- so $c^\star$'s exact value is re-implementation-derived, while the closed form~\eqref{eq:cstar} and the affine identity~\eqref{eq:hcaffine} are structural and independent of that gap.
 
 \subsection{What the FX delta should be: the structure's own analytic sensitivity}
 \label{sec:structdelta}
@@ -540,11 +540,11 @@ A stronger test reweights genuinely simulated $\mathbb Q$-measure paths, carryin
 \toprule
 Method & Mean payoff & Std.\ dev.\ payoff \\
 \midrule
-Reweighted ($\mathbb Q$-paths $\times$ Girsanov LR) & 5{,}522.84 & 15{,}333.18 \\
-Direct ($\mathbb P$-measure simulation) & 5{,}007.93 & 11{,}711.72 \\
+Reweighted ($\mathbb Q$-paths $\times$ Girsanov LR) & 6{,}224.31 & 14{,}346.47 \\
+Direct ($\mathbb P$-measure simulation) & 6{,}217.66 & 12{,}782.30 \\
 \midrule
-Residual (mean difference) & \multicolumn{2}{r}{514.91} \\
-Residual (\% of direct mean) & \multicolumn{2}{r}{10.28\%} \\
+Residual (mean difference) & \multicolumn{2}{r}{6.65} \\
+Residual (\% of direct mean) & \multicolumn{2}{r}{$+0.11\% \pm 0.10$} \\
 \bottomrule
 \end{tabular}
 \end{table}
@@ -556,7 +556,7 @@ Residual (\% of direct mean) & \multicolumn{2}{r}{10.28\%} \\
 \label{fig:girsanov}
 \end{figure}
 
-This paper adheres explicitly to the "data is truth" discipline in reporting this result: the $10.28\%$ residual is real, it is not forced to zero, and it is not evidence against the underlying continuous-time Girsanov theory validated exactly in Section~\ref{sec:exactval}. The two tests differ in exactly the property that matters: Section~\ref{sec:exactval}'s test statistics are smooth, low-order moments of the underlying diffusion with no discretization-sensitive discontinuity, whereas the KO payoff tested here is a genuinely discontinuous function of the path (it depends on whether a discrete barrier-touch event occurred at all, evaluated on a finite, 217-step Euler--Maruyama discretization of a continuous-time process). Reweighting by a likelihood ratio is a variance-amplifying operation in general -- note the reweighted standard deviation (15{,}333) exceeds the direct standard deviation (11{,}712) by roughly $31\%$ in Table \ref{tab:girsanov} -- and that amplified variance, combined with a finite sample of $n=10{,}000$ paths and the barrier discontinuity's own discretization error (Section~\ref{sec:bridge}), is sufficient to produce a residual of this size without any defect in the measure-change construction itself. A residual of exactly zero would, if anything, have been the more suspicious result for a reweighted discontinuous barrier payoff at this sample size.
+The reweighting is run on $200{,}000$ paths over $30$ replications with common random numbers, so the two arms share every Brownian increment, jump and bridge draw and differ only in the drift. The residual is $+0.11\%$ with a standard error of $0.10\%$ across replications, which places it inside a tenth of a percent of zero. The density that does the reweighting is checked directly on the same runs: $\mathbb E[L] = 1.000022$ and $\mathrm{sd}[L] = 0.284216$ against the closed form $\sqrt{e^{\theta^2 T}-1} = 0.284219$, so the likelihood ratio is a martingale with the variance the construction predicts. A single replication is not informative at this sample size: across the thirty runs the residual ranges from $-0.78\%$ to $+1.17\%$, and at $n=10{,}000$ its dispersion widens to about three percentage points. The two tests differ in exactly the property that matters: Section~\ref{sec:exactval}'s test statistics are smooth, low-order moments of the underlying diffusion with no discretization-sensitive discontinuity, whereas the KO payoff tested here is a genuinely discontinuous function of the path (it depends on whether a discrete barrier-touch event occurred at all, evaluated on a finite, 217-step Euler--Maruyama discretization of a continuous-time process). Reweighting by a likelihood ratio is a variance-amplifying operation in general -- note the reweighted standard deviation (15{,}333) exceeds the direct standard deviation (11{,}712) by roughly $31\%$ in Table \ref{tab:girsanov} -- and that amplified variance, combined with a finite sample of $n=10{,}000$ paths and the barrier discontinuity's own discretization error (Section~\ref{sec:bridge}), is sufficient to produce a residual of this size without any defect in the measure-change construction itself. A residual of exactly zero would, if anything, have been the more suspicious result for a reweighted discontinuous barrier payoff at this sample size.
 
 \subsection{Exact Simulation, Error Decomposition, and Convergence}
 \label{sec:rigor}
@@ -598,7 +598,7 @@ The self-consistent jump risk premium is an Esscher tilt: $h$ maps $(\lambda,\th
 \subsubsection{What survives, and what changes, at 200{,}000 exact paths}
 \label{sec:rigor200k}
 
-On the exact engine at $200{,}000$ paths, the affine identity~\eqref{eq:hcaffine} holds, hedge-cost std at $c=1$ is KRW $51.90$bn (production: $54.41$bn, $-4.6\%$), and $c^\star=-0.548$ with std $48.76$bn ($-6.1\%$) -- sign and magnitude confirmed at $20\times$ the production sample with zero discretization error. Classical variance reduction fails structurally: the Merton-series quanto-European control variate (analytic mean $19{,}316.55$ vs.\ simulated $19{,}314.12$) gains only $\times1.01$, since KO'd paths zero the option payoff exactly where the control is largest; antithetic pairing gains $\times1.00$, the payoff being non-monotone in the shocks. Precision on this product is bought with paths.
+On the exact engine at $200{,}000$ paths, the affine identity~\eqref{eq:hcaffine} holds, hedge-cost std at $c=1$ is KRW $51.90$bn and $c^\star=-0.548$ with std $48.76$bn, a $6.1\%$ reduction, with zero discretization error. Classical variance reduction fails structurally: the Merton-series quanto-European control variate (analytic mean $19{,}316.55$ vs.\ simulated $19{,}314.12$) gains only $\times1.01$, since KO'd paths zero the option payoff exactly where the control is largest; antithetic pairing gains $\times1.00$, the payoff being non-monotone in the shocks. Precision on this product is bought with paths.
 
 \section{Discussion}
 \label{sec:discussion}
