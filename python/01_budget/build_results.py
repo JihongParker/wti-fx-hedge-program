@@ -25,8 +25,10 @@ M1 = Qo*max(0, I['Stress_WTI']-I['WTI_spot'])*I['Stress_KRW']
 M2 = Qu*max(0, I['Stress_KRW']-I['KRW_spot'])
 K1E = Qo*I['Black76_call']*I['KRW_spot']*(1+rw*T1)
 K2E = Qu*I['GK_call']*(1+rw*T2)
-K1A = I['LSMC_WTI_shapley']*Qo*np.exp(rw*T1)
-K2A = I['LSMC_FX_shapley']*Qo*np.exp(rw*T2)
+# both regimes carry cash premiums on the same simple-interest factor (1 + r_w T);
+# the American legs previously used exp(r_w T), a 0.16% difference on K1A
+K1A = I['LSMC_WTI_shapley']*Qo*(1+rw*T1)
+K2A = I['LSMC_FX_shapley']*Qo*(1+rw*T2)
 
 gm = lambda w1, w2: np.sqrt((1-w1)**2*S1*S1 + (1-w2)**2*S2*S2 + 2*(1-w1)*(1-w2)*S1*S2*RHO)
 cE = lambda w1, w2: K1E*w1 + K2E*w2 + M1*(1-w1) + M2*(1-w2)
