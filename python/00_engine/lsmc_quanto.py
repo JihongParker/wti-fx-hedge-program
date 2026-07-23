@@ -65,7 +65,8 @@ def price(K=None, npaths=50_000, seed=12345, **over):
     S1, S2, AL = _paths(c, npaths, rng)
     S, disc = c['steps'], np.exp(-c['r_US']*c['T']/c['steps'])
     CF = np.where(AL[:, S], np.maximum(S1[:, S].astype(float)-K, 0)*S2[:, S], 0.0)
-    for i in range(S-1, 0, -1):
+    with np.errstate(all='ignore'):
+     for i in range(S-1, 0, -1):
         CF *= disc
         m = AL[:, i] & (S1[:, i] > K)
         if m.sum() > 10:
