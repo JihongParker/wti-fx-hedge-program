@@ -47,7 +47,7 @@ K2_EU = I['Monthly_USD_Need']*I['GK_call']*(1+I['WACC']*I['Maturity_FX'])
 M1_EU = I['Monthly_Oil_Need']*max(0.0, I['Stress_WTI']-I['WTI_spot'])*I['Stress_KRW']
 M2_EU = I['Monthly_USD_Need']*max(0.0, I['Stress_KRW']-I['KRW_spot'])
 K1_AM = I['LSMC_WTI_shapley']*I['Monthly_Oil_Need']*np.exp(I['WACC']*I['Maturity_Oil'])
-K2_AM = I['LSMC_FX_shapley']*I['Monthly_USD_Need']*np.exp(I['Maturity_FX']*I['WACC'])
+K2_AM = I['LSMC_FX_shapley']*I['Monthly_Oil_Need']*np.exp(I['Maturity_FX']*I['WACC'])
 FXGAP = max(0.0, I['Stress_KRW']-I['KRW_spot'])
 
 def cost_eu(W1, W2):
