@@ -211,7 +211,7 @@ resid = [r[3] for r in db]
 ax2.plot(Tvals, resid, 'o-', color='black')
 ax2.set_xlabel('Maturity $T$ (years)')
 ax2.set_ylabel('Simulated $-$ theoretical drift bias')
-ax2.set_title('Closed-form P/Q drift-bias check\n(machine-precision agreement)')
+ax2.set_title('Closed-form P/Q drift-bias check\n(agreement to numerical tolerance)')
 ax2.ticklabel_format(axis='y', style='sci', scilimits=(0,0))
 fig.tight_layout()
 savefig(fig, 'fig_girsanov_validation.pdf')
