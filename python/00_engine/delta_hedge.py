@@ -33,7 +33,10 @@ except ImportError:               # vectorised standard normal CDF
 def fit_surface(K=None, npaths=200_000, seed=12345, **over):
     """Price by LSMC and keep the per-step regression coefficients."""
     c = dict(CAL); c.update(over)
-    K = c['S1_0'] if K is None else K
+    if K is None:                                   # see lsmc_quanto.price
+        if 'S1_0' in over:
+            raise ValueError("S1_0 overridden without an explicit K: pass K=<contract strike>.")
+        K = CAL['S1_0']
     rng = np.random.default_rng(seed)
     S1, S2, AL = _paths(c, npaths, rng)
     n, disc = c['steps'], np.exp(-c['r_US']*c['T']/c['steps'])
@@ -74,21 +77,47 @@ def b76_delta(S1, K, sig, tau, r):
 
 
 def run(fit, npaths=200_000, seed=777, scale=1.0, proxy=False, Qo=2_000_000, r_w=0.07,
-        clip=True):
+        clip=True, net_fx=True, exercise=None):
     """Daily-rebalanced delta hedge of a short KO quanto position on Qo barrels.
 
     Hedge instruments: WTI futures (h1 barrels) and a USD forward (h2 dollars).
-    Returns the hedge cost per path in KRW, defined as the terminal payoff owed
-    less the premium carried forward and less what the hedge portfolio earned.
+    Returns the hedge cost per path in KRW, defined as the payoff owed at the
+    stopping time less the premium carried forward and less the hedge's earnings.
+
+    net_fx=True   subtract the USD exposure the futures leg already carries, so
+                  the book's total dS2 sensitivity matches dV/dS2.  The futures
+                  position is worth g1*S1 dollars; without this the FX leg is
+                  Qo*dV2 ON TOP of that, roughly a 5x over-hedge, which is the
+                  very error Section 7.6 of the paper warns against.
+    exercise      stop the ledger at the LSMC exercise time.  Defaults to True
+                  when fit['price'] is an American value, which it always is,
+                  since fit_surface applies the exercise rule.  A European
+                  ledger charged an American premium mixes two contracts.
+
+    Set net_fx=False, exercise=False to reproduce the pre-2026-07 behaviour.
     """
     c, K, beta = fit['cal'], fit['K'], fit['beta']
     n = c['steps']; dt = c['T']/n; S20 = c['S2_0']; gr = exp(r_w*dt)
+    if exercise is None:
+        exercise = not proxy          # the fitted surface carries an exercise rule
     rng = np.random.default_rng(seed)
     S1, S2, AL = _paths(c, npaths, rng)
     S1 = S1.astype(float); S2 = S2.astype(float)
 
     cash = np.zeros(npaths); h1 = np.zeros(npaths); h2 = np.zeros(npaths)
+    live = np.ones(npaths, bool)                      # still holding the contract
+    booked = np.zeros(npaths)                         # payoff taken at the stop time
     for i in range(n):
+        if exercise and i > 0:
+            v1 = S1[:, i]/K; v2 = S2[:, i]/S20
+            X = np.column_stack([np.ones(npaths), v1, v2, v1*v1, v2*v2, v1*v2])
+            cont = np.nan_to_num(X) @ beta[i]
+            intr = np.maximum(S1[:, i]-K, 0)*S2[:, i]
+            stop = live & AL[:, i] & (S1[:, i] > K) & np.isfinite(cont) & (intr > cont)
+            if stop.any():                            # unwind the hedge, book intrinsic
+                cash[stop] += h1[stop]*S1[stop, i]*S2[stop, i] + h2[stop]*S2[stop, i]
+                booked[stop] = intr[stop]*Qo
+                h1[stop] = 0.0; h2[stop] = 0.0; live[stop] = False
         if proxy:
             g1 = Qo*b76_delta(S1[:, i], K, c['vol1'], c['T']-i*dt, c['r_US'])
             g2 = np.zeros(npaths)                     # a vanilla proxy has no FX leg
@@ -104,14 +133,17 @@ def run(fit, npaths=200_000, seed=777, scale=1.0, proxy=False, Qo=2_000_000, r_w
             d1v = np.clip(raw1, 0.0, 1.0) if clip else np.clip(raw1, -5.0, 5.0)
             g1 = Qo*np.where(dom, d1v, 0.0)
             g2 = Qo*np.where(dom, np.clip(dV2, -20.0, 20.0), 0.0)
-        alive = AL[:, i]
+        alive = AL[:, i] & live
         g1 = np.where(alive, scale*g1, 0.0); g2 = np.where(alive, scale*g2, 0.0)
+        if net_fx:
+            g2 = np.where(alive, g2 - g1*S1[:, i], 0.0)
         cash -= (g1-h1)*S1[:, i]*S2[:, i] + (g2-h2)*S2[:, i]
         h1, h2 = g1, g2
         cash *= gr
     cash += h1*S1[:, n]*S2[:, n] + h2*S2[:, n]
-    payoff = np.where(AL[:, n], np.maximum(S1[:, n]-K, 0)*S2[:, n], 0.0)*Qo
-    return payoff - fit['price']*Qo*exp(r_w*c['T']) - cash
+    booked[live] = np.where(AL[live, n],
+                            np.maximum(S1[live, n]-K, 0)*S2[live, n], 0.0)*Qo
+    return booked - fit['price']*Qo*exp(r_w*c['T']) - cash
 
 
 if __name__ == '__main__':
