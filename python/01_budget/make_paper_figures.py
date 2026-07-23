@@ -243,13 +243,15 @@ ax.plot(p, adopted, color='black', lw=1.3,
 ax.plot(p, min_cost, color='0.45', lw=1.3, ls='--',
         label='pure-KO book, minimum attainable')
 ax.plot(p, mixed, color='black', lw=2.0, ls='-.',
+        marker='o', ms=5, markevery=60, markerfacecolor='white',
+        markeredgecolor='black', markeredgewidth=1.1,
         label='mixed vanilla/KO program optimum')
 ax.axhline(B/1e9, color='black', lw=0.8, ls=':')
-ax.text(0.012, B/1e9 + 2.5, 'budget cap = 45 bn', fontsize=8, color='0.15')
+ax.text(0.012, B/1e9 + 5.0, 'budget cap = 45 bn', fontsize=8, color='0.15')
 ax.axvline(PSTAR_S7, color='0.45', lw=0.9, ls='-.')
 ax.text(PSTAR_S7 + 0.008, 100, f'$p^*={PSTAR_S7:.4f}$\n(pure KO dies)', fontsize=7.5, color='0.15')
-for pk, lab, dy in [(0.2309, 'unconditional KO rate\n(net of early exercise)', 16),
-                    (0.4369, 'unconditional\nbarrier-touch rate', 16)]:
+for pk, lab, dy in [(0.2309, 'unconditional KO rate\n(net of early exercise)', 24),
+                    (0.4369, 'unconditional\nbarrier-touch rate', 18)]:
     ax.plot([pk], [np.interp(pk, p, adopted)], marker='o', ms=5, color='black')
     ax.annotate(lab, xy=(pk, np.interp(pk, p, adopted)),
                 xytext=(pk + 0.02, np.interp(pk, p, adopted) - dy),
@@ -276,7 +278,7 @@ pk = [a for a, b in cv]
 sk = [b for a, b in cv]
 ax.plot(pk, sk, color='0.45', lw=1.4, ls='--', label='all-KO branch (budget-feasible part)')
 ax.axhline(SIGV, color='0.45', lw=1.4, ls=':',
-           label='all-vanilla branch $\\sigma=%.4f$' % SIGV)
+           label='all-vanilla branch $\\sigma=%.6f$' % SIGV)
 # mixed = lower envelope
 pe = np.linspace(0, 0.15, 601)
 env = []
@@ -285,20 +287,35 @@ for q in pe:
         env.append(min(np.interp(q, pk, sk), SIGV))
     else:
         env.append(SIGV)
-ax.plot(pe, env, color='black', lw=2.2, label='mixed program optimum (envelope)')
-for x, lab, tx, ty in [
-        (PFLOOR, 'floor regime ends\n$p=%.4f$' % PFLOOR, PFLOOR - 0.024, 0.09165),
-        (PCROSS, 'KO$\\to$vanilla switch\n$p=\\bar p=%.4f$' % PCROSS, PCROSS + 0.0015, 0.09145),
-        (PSTAR, 'pure KO infeasible\n$p^*=%.4f$' % PSTAR, PSTAR + 0.0015, 0.09165)]:
+ax.plot(pe, env, color='black', lw=2.2,
+        marker='o', ms=5, markevery=50, markerfacecolor='white',
+        markeredgecolor='black', markeredgewidth=1.1,
+        label='mixed program optimum (envelope)')
+# The whole switch lives in a 1.8e-5 band of sigma_res: the floor level and the
+# all-vanilla level differ by less than a fifth of a basis point. Scale the axis
+# to that band (not to a round 0.0905-0.0920 window) so the KO->vanilla
+# transition is legible; the all-KO branch leaves the frame by construction.
+SIG_FLOOR = float(np.min(env))
+YLO = SIG_FLOOR - 0.28 * (SIGV - SIG_FLOOR)
+YHI = SIGV + 1.15 * (SIGV - SIG_FLOOR)   # headroom for the legend
+span = YHI - YLO
+for x, lab, tx, ty, ha in [
+        (PFLOOR, 'floor regime ends\n$p=%.4f$' % PFLOOR,
+         PFLOOR - 0.004, SIGV - 0.06 * span, 'right'),
+        (PCROSS, 'KO$\\to$vanilla switch\n$p=\\bar p=%.4f$' % PCROSS,
+         PCROSS + 0.003, SIG_FLOOR + 0.26 * span, 'left'),
+        (PSTAR, 'pure KO infeasible\n$p^*=%.4f$' % PSTAR,
+         PSTAR + 0.003, SIGV + 0.30 * (SIGV - SIG_FLOOR), 'left')]:
     ax.axvline(x, color='0.6', lw=0.8, ls='-.')
-    ax.text(tx, ty, lab, fontsize=7, color='0.15', va='top')
+    ax.text(tx, ty, lab, fontsize=7, color='0.15', va='top', ha=ha)
 ax.annotate('measured stress-conditional $p_{KO}=0.8925$\n'
             '$\\Rightarrow$ deep in the all-vanilla regime $\\rightarrow$',
-            xy=(0.149, SIGV), xytext=(0.085, 0.09085), fontsize=8, color='black')
+            xy=(0.149, SIGV), xytext=(0.079, SIG_FLOOR + 0.30 * span),
+            fontsize=8, color='black')
 ax.set_xlim(0, 0.15)
-ax.set_ylim(0.0905, 0.0920)
-ax.yaxis.set_major_locator(MultipleLocator(0.0005))
-ax.yaxis.set_major_formatter(FormatStrFormatter('%.4f'))
+ax.set_ylim(YLO, YHI)
+ax.yaxis.set_major_locator(MultipleLocator(5e-6))
+ax.yaxis.set_major_formatter(FormatStrFormatter('%.6f'))
 ax.set_xlabel('$p_{KO}$ (probability the KO structure is dead under stress)')
 ax.set_ylabel(r'optimal $\sigma_{res}$ of the mixed program')
 ax.set_title('Instrument choice inside the mixed program: the three regimes')
