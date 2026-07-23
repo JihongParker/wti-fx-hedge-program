@@ -62,9 +62,10 @@ def main(npaths=200_000):
     add(('European WTI full cover (KRW)', 41258998746, K1E, 'from P_B76'))
     add(('European FX full cover (KRW)', 13835108654, K2E, 'from P_GK'))
 
-    wl = (s1A**2-rho*s1A*s2)/(s1A**2+s2**2-2*rho*s1A*s2)
-    add(('American risk-min w1 (line GMVP)', 0.945202, wl, 'closed form'))
-    add(('American sigma_res', 0.0908014, sigma_res(wl, 1-wl, s1A, s2, rho), 'closed form'))
+    # sigma_res takes the raw historical volatility in both regimes
+    wl = (s1E**2-rho*s1E*s2)/(s1E**2+s2**2-2*rho*s1E*s2)
+    add(('American risk-min w1 (line GMVP)', 0.965980, wl, 'closed form'))
+    add(('American sigma_res', 0.091585, sigma_res(wl, 1-wl, s1E, s2, rho), 'closed form'))
 
     # on w1+w2=1 the European ledger is strictly decreasing in w1, so the
     # unconstrained line minimiser is priced out and the optimum slides up to
@@ -84,9 +85,9 @@ def main(npaths=200_000):
     add(('European sigma_res', 0.0916021, sigma_res(wE, 1-wE, s1E, s2, rho), 'closed form'))
     add(('European ledger at the vertex', 45000000000.0, cE(wE), 'budget binds')) 
 
-    PK = sh['v_wti_only']*Qo
-    add(('pbar  (P_V - P_K)/UL_WTI', 0.061606, (K1E-PK)/M1, 'from engine P_K'))
-    add(('p*    (B - P_K - UL_FX)/UL_WTI', 0.083042, (B-PK-M2)/M1, 'from engine P_K'))
+    PK = sh['v_wti_only']*Qo*(1+rw*T1)      # same funding factor as P_V
+    add(('pbar  (P_V - P_K)/UL_WTI', 0.042413, (K1E-PK)/M1, 'from engine P_K'))
+    add(('p*    (B - P_K - UL_FX)/UL_WTI', 0.063848, (B-PK-M2)/M1, 'from engine P_K'))
 
     w = max(len(r[0]) for r in rows)
     print(f"{'quantity'.ljust(w)}  {'paper':>18}  {'from source':>18}   gap      source")

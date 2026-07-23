@@ -22,10 +22,13 @@ C = R['coeffs']
 
 Qo, Qu = I['Monthly_Oil_Need'], I['Monthly_USD_Need']
 B, rw, T1, T2 = I['Max_Budget'], I['WACC'], I['Maturity_Oil'], I['Maturity_FX']
-s1A, s2, rho = I['sigma_WTI_diff'], I['sigma_FX'], I['rho']
+# sigma_res measures the uncovered exposure, so it takes the raw historical
+# volatility in both regimes; the diffusive figure is a pricing-engine input
+s1A, s2, rho = I['sigma_WTI_hist'], I['sigma_FX'], I['rho']
 
 PV, PGK = C['K1E'], C['K2E']        # vanilla WTI / FX full cover (eq. costeu)
-PK      = 17377.11*Qo               # standalone LSMC KO premium, paper Sec.8
+PK      = 17377.11*Qo*(1+rw*T1)     # standalone LSMC KO premium on the same
+                                    # funding factor eq. costeu applies to P_V
 M1, M2  = C['M1'], C['M2']          # UL_WTI, UL_FX
 K1A, K2A = C['K1A'], C['K2A']       # Shapley-attributed American coefficients
 print(f"PV={PV:,.0f}  PK={PK:,.0f}  PGK={PGK:,.0f}  M1={M1:,.0f}  M2={M2:,.0f}")
@@ -85,8 +88,8 @@ out = {'sigV': float(sigV), 'pfloor': float(pfloor), 'pcross': float(pcross),
        'pstar': float(pstar), 'pstar_shapley': float(pstar_shapley),
        'curve': curve, 'pm': PM,
        'minatt_at_pm': float(K1A + PM*M1 + M2),
-       'adopted_adj_at_pm': float(K1A*0.945202 + K2A*0.054798
-                                  + (1-0.945202*(1-PM))*M1 + (1-0.054798*(1-PM))*M2)}
+       'adopted_adj_at_pm': float(K1A*wl1 + K2A*wl2
+                                  + (1-wl1*(1-PM))*M1 + (1-wl2*(1-PM))*M2)}
 json.dump(out, open(_find('v2_curve.json'), 'w'), indent=1)
 print(f"minatt@pm={out['minatt_at_pm']/1e9:.2f}bn  adopted@pm={out['adopted_adj_at_pm']/1e9:.2f}bn")
 print("curve last feasible p:", max(p for p,s in curve if s is not None))
