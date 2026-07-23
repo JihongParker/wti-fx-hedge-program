@@ -50,7 +50,7 @@ def cost_am(W1, W2): return K1A*W1 + K2A*W2 + M1*(1-W1) + M2*(1-W2)
 
 ENG = [
     ('European (Black-76 / GK premiums)', I['sigma_WTI_hist'], cost_eu, R['EU']),
-    ('American (LSMC Shapley premiums)', I['sigma_WTI_diff'], cost_am, R['AM']),
+    ('American (LSMC Shapley premiums)', I['sigma_WTI_hist'], cost_am, R['AM']),
 ]
 
 # =====================================================================
@@ -218,7 +218,7 @@ V2 = json.load(open(_find('v2_curve.json')))
 PM = V2['pm']                       # stress-conditional pKO (MC measured)
 PSTAR = V2['pstar']                 # Sec.8: pure-KO dies, standalone KO price
 PSTAR_S7 = V2['pstar_shapley']      # Sec.7 eq. pstar: pure-KO dies, Shapley-priced quanto
-PK = 17377.11 * I['Monthly_Oil_Need']   # standalone LSMC KO premium (Sec.8)
+PK = 17377.11 * I["Monthly_Oil_Need"] * (1 + I["WACC"]*I["Maturity_Oil"])  # Sec.8, same funding factor as P_V
 PCROSS = V2['pcross']
 PFLOOR = V2['pfloor']
 SIGV = V2['sigV']
@@ -230,7 +230,9 @@ adopted = (K1A*rmA['w1'] + K2A*rmA['w2']
            + (1-rmA['w1']*(1-p))*M1 + (1-rmA['w2']*(1-p))*M2) / 1e9
 # mixed-program optimum ledger: floor-point cost while unconstrained, then
 # budget-pinned at exactly B
-w1f, w2f = 0.945202, 0.054798
+w1f = (I['sigma_WTI_hist']**2 - I['rho']*I['sigma_WTI_hist']*I['sigma_FX']) / \
+      (I['sigma_WTI_hist']**2 + I['sigma_FX']**2 - 2*I['rho']*I['sigma_WTI_hist']*I['sigma_FX'])
+w2f = 1 - w1f
 mixed = np.where(p < PFLOOR,
                  (PK*w1f + K2E*w2f + (1-w1f*(1-p))*M1 + (1-w2f)*M2)/1e9,
                  B/1e9)
