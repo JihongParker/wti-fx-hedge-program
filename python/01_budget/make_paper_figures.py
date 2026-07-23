@@ -260,11 +260,17 @@ for pk, lab, dy in [(0.2309, 'unconditional KO rate\n(net of early exercise)', 2
                 xytext=(pk + 0.02, np.interp(pk, p, adopted) - dy),
                 fontsize=7.5, color='0.15',
                 arrowprops=dict(arrowstyle='->', color='0.15', lw=0.8))
-yA = np.interp(PM, p, adopted)
-ax.plot([PM], [yA], marker='*', ms=14, color='black')
-ax.annotate(f'stress-conditional MC estimate\n$p_{{KO}}={PM:.4f}$: ledger {yA:.1f} bn',
-            xy=(PM, yA), xytext=(PM - 0.34, yA - 32), fontsize=8, color='black',
+PHELD = 0.4901                      # held-contract mortality (Sec. 7): the operative figure
+yH = np.interp(PHELD, p, adopted)
+ax.plot([PHELD], [yH], marker='*', ms=14, color='black')
+ax.annotate(f'held-contract stress mortality\n$p_{{KO}}={PHELD:.4f}$: ledger {yH:.1f} bn',
+            xy=(PHELD, yH), xytext=(PHELD - 0.30, yH + 26), fontsize=8, color='black',
             arrowprops=dict(arrowstyle='->', color='black', lw=0.9))
+yA = np.interp(PM, p, adopted)
+ax.plot([PM], [yA], marker='o', ms=6, mfc='white', mec='black', mew=1.2)
+ax.annotate(f'newly-struck at stress spot\n$p_{{KO}}={PM:.4f}$', xy=(PM, yA),
+            xytext=(PM - 0.30, yA - 26), fontsize=7.5, color='0.35',
+            arrowprops=dict(arrowstyle='->', color='0.35', lw=0.8))
 ax.set_xlabel('$p_{KO}$ (probability the KO structure is dead under stress)')
 ax.set_ylabel('stress-adjusted total cost (bn KRW)')
 ax.set_title('Knock-out survival haircut: pure-KO book vs. the mixed program')
