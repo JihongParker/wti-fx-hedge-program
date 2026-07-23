@@ -60,7 +60,17 @@ def _paths(c, npaths, rng):
 
 def price(K=None, npaths=50_000, seed=12345, **over):
     c = dict(CAL); c.update(over)
-    K = c['S1_0'] if K is None else K
+    # K defaults to the CALIBRATION spot, never to an overridden one: a caller
+    # bumping S1_0 for a finite difference must be re-pricing the SAME contract,
+    # so letting K follow S1_0 silently measures a spot-and-strike translation
+    # instead of a delta.  Overriding S1_0 without naming K is now an error.
+    if K is None:
+        if 'S1_0' in over:
+            raise ValueError(
+                "S1_0 overridden without an explicit K: pass K=<contract strike>. "
+                "Note KOupper/KOlower are absolute levels, so bumping S1_0 also "
+                "changes barrier moneyness; state which of K, U, L you hold fixed.")
+        K = CAL['S1_0']
     rng = np.random.default_rng(seed)
     S1, S2, AL = _paths(c, npaths, rng)
     S, disc = c['steps'], np.exp(-c['r_US']*c['T']/c['steps'])
