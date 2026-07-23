@@ -7,9 +7,17 @@ corrected_results.json, so every threshold the paper quotes for Section 8
 import json, os
 import numpy as np
 
-os.chdir('/Users/elijahjasper/modeling/Ratio_Optimization')
-I = json.load(open('opt_scraped.json'))['inputs']
-R = json.load(open('corrected_results.json'))
+def _find(name):
+    """Read inputs from the version-controlled data/results/ copy when present."""
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    for c in (os.path.join(here, '..', '..', 'data', 'results', name), name):
+        if os.path.exists(c):
+            return c
+    raise FileNotFoundError(name)
+
+I = json.load(open(_find('opt_inputs.json')))['inputs']
+R = json.load(open(_find('corrected_results.json')))
 C = R['coeffs']
 
 Qo, Qu = I['Monthly_Oil_Need'], I['Monthly_USD_Need']
@@ -79,6 +87,6 @@ out = {'sigV': float(sigV), 'pfloor': float(pfloor), 'pcross': float(pcross),
        'minatt_at_pm': float(K1A + PM*M1 + M2),
        'adopted_adj_at_pm': float(K1A*0.945202 + K2A*0.054798
                                   + (1-0.945202*(1-PM))*M1 + (1-0.054798*(1-PM))*M2)}
-json.dump(out, open('v2_curve.json','w'), indent=1)
+json.dump(out, open(_find('v2_curve.json'), 'w'), indent=1)
 print(f"minatt@pm={out['minatt_at_pm']/1e9:.2f}bn  adopted@pm={out['adopted_adj_at_pm']/1e9:.2f}bn")
 print("curve last feasible p:", max(p for p,s in curve if s is not None))

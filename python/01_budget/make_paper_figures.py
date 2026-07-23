@@ -5,6 +5,15 @@ corrected_results.json (solved optima) only.  Grayscale throughout.
 """
 import json, os
 import numpy as np
+
+def _find(name):
+    """Read inputs from the version-controlled data/results/ copy when present."""
+    import os
+    here = os.path.dirname(os.path.abspath(__file__))
+    for c in (os.path.join(here, '..', '..', 'data', 'results', name), name):
+        if os.path.exists(c):
+            return c
+    raise FileNotFoundError(name)
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -18,8 +27,8 @@ plt.rcParams.update({
     'image.cmap': 'gray', 'axes.prop_cycle': plt.cycler(color=['black']),
 })
 
-D = json.load(open('opt_scraped.json')); I = D['inputs']
-R = json.load(open('corrected_results.json'))
+D = json.load(open(_find('opt_inputs.json'))); I = D['inputs']
+R = json.load(open(_find('corrected_results.json')))
 B = I['Max_Budget']; S2, RHO = I['sigma_FX'], I['rho']
 C = R['coeffs']
 K1E, K2E, K1A, K2A, M1, M2 = C['K1E'], C['K2E'], C['K1A'], C['K2A'], C['M1'], C['M2']
@@ -205,7 +214,7 @@ savefig(fig, 'fig_budget_sweep.pdf')
 # =====================================================================
 # Figure 4: knock-out survival haircut (American structure)
 # =====================================================================
-V2 = json.load(open('v2_curve.json'))
+V2 = json.load(open(_find('v2_curve.json')))
 PM = V2['pm']                       # stress-conditional pKO (MC measured)
 PSTAR = V2['pstar']                 # Sec.8: pure-KO dies, standalone KO price
 PSTAR_S7 = V2['pstar_shapley']      # Sec.7 eq. pstar: pure-KO dies, Shapley-priced quanto
