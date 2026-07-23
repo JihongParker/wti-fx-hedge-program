@@ -73,7 +73,8 @@ def b76_delta(S1, K, sig, tau, r):
     return np.exp(-r*tau)*Ncdf(d1)
 
 
-def run(fit, npaths=200_000, seed=777, scale=1.0, proxy=False, Qo=2_000_000, r_w=0.07):
+def run(fit, npaths=200_000, seed=777, scale=1.0, proxy=False, Qo=2_000_000, r_w=0.07,
+        clip=True):
     """Daily-rebalanced delta hedge of a short KO quanto position on Qo barrels.
 
     Hedge instruments: WTI futures (h1 barrels) and a USD forward (h2 dollars).
@@ -97,7 +98,11 @@ def run(fit, npaths=200_000, seed=777, scale=1.0, proxy=False, Qo=2_000_000, r_w
             # gradient is used only where it was fitted; elsewhere the barrier
             # call is out of the money and carries no first-order exposure
             dom = AL[:, i] & (S1[:, i] > K)
-            g1 = Qo*np.where(dom, np.clip(dV1/S2[:, i], 0.0, 1.0), 0.0)
+            raw1 = dV1/S2[:, i]
+            # clip=False keeps the negative deltas an up-and-out call genuinely
+            # carries near the upper barrier; the production run clips to [0,1]
+            d1v = np.clip(raw1, 0.0, 1.0) if clip else np.clip(raw1, -5.0, 5.0)
+            g1 = Qo*np.where(dom, d1v, 0.0)
             g2 = Qo*np.where(dom, np.clip(dV2, -20.0, 20.0), 0.0)
         alive = AL[:, i]
         g1 = np.where(alive, scale*g1, 0.0); g2 = np.where(alive, scale*g2, 0.0)
