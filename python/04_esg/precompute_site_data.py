@@ -148,7 +148,7 @@ def main():
         "P_Sh_WTI": 15093.75, "P_Sh_FX": 2038.72, "P_K_standalone": 17377.11,
         "base_quanto_premium": 17132.47,
         "pko_stress_paper": 0.8925, "pstar_shapley": 0.10913,
-        "pstar_standalone": 0.06243, "pbar": 0.06161,
+        "pstar_standalone": 0.08304, "pbar": 0.06161,
         "A_FV0": 34_264_941_589,
     }
 
