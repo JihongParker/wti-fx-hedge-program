@@ -39,7 +39,8 @@ def fit_surface(K=None, npaths=200_000, seed=12345, **over):
     n, disc = c['steps'], np.exp(-c['r_US']*c['T']/c['steps'])
     beta = np.zeros((n+1, 6))
     CF = np.where(AL[:, n], np.maximum(S1[:, n].astype(float)-K, 0)*S2[:, n], 0.0)
-    for i in range(n-1, 0, -1):
+    with np.errstate(all='ignore'):
+     for i in range(n-1, 0, -1):
         CF *= disc
         m = AL[:, i] & (S1[:, i] > K)
         if m.sum() > 10:
