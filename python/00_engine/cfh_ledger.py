@@ -1,15 +1,20 @@
 """IFRS 9 cash-flow-hedge ledgers for the two designation architectures.
 
 Structure A designates the combined quanto knock-out call against the aggregated
-exposure.  Structure B splits the same exposure into two independently
-designated risk components carried as genuine forwards: a WTI forward struck at
-F0 = S1(0) e^{r_US T_WTI} on the barrel position, and a USD/KRW forward struck at
-G0 = S2(0) e^{(r_KRW - r_US) T_FX} on the dollar notional N_FX = barrels x F0.
+exposure: its payoff multiplies by the floating S2(T), so the two risk factors
+are coupled inside one instrument.
 
-B's cash-flow-hedge reserve on the currency leg is the signed lower of the
-instrument's fair value and the hypothetical derivative's, which is where the
-two architectures separate: the hypothetical rides the WTI forward price, the
-instrument does not.
+Structure B splits the same exposure into two independently designated risk
+components.  B1 is the same knock-out call on the barrel position marked at the
+fixed inception rate S2(0), which severs that coupling so the leg prices
+commodity risk alone; it dies on the same barrier A does.  B2 is a stand-alone
+currency call on the dollar notional N_FX = barrels x F0, which carries no
+barrier.  Cash-flow-hedge reserves are the signed lower of each instrument's
+fair value and its hypothetical derivative's.
+
+legs='forwards' swaps B's option legs for genuine forwards struck at
+F0 = S1(0) e^{r_US T_WTI} and G0 = S2(0) e^{(r_KRW - r_US) T_FX}.  That variant
+is a different instrument set, not Structure B.
 
 Paths are physical measure with the asymmetric up/down jump calibration.
 """
@@ -93,16 +98,21 @@ def signed_lower_of(v, h):
     return np.sign(v)*np.minimum(np.abs(v), np.abs(h))
 
 
-def structures(npaths=200_000, seed=20260706, K=None, V_A0=17_448.76):
+def structures(npaths=200_000, seed=20260706, K=None, V_A0=17_448.76, legs='options'):
     r = simulate(npaths, seed)
     c, T = r['cal'], CAL['T_WTI']
     s1, s2 = r['s1'], r['s2']
     K = c['S1_0'] if K is None else K
 
     # B1 marks the barrel leg at the FIXED inception rate, which is what severs
-    # the quanto coupling A carries; B2 carries the currency leg on its own
-    vW = fwd_wti(s1, r['F0'], c, T)*c['S2_0']
-    vF = fwd_fx(s2, r['G0'], r['NFX'], c, T)
+    # the quanto coupling A carries, and dies on the same barrier; B2 carries
+    # the currency leg on its own with no barrier
+    if legs == 'forwards':
+        vW = fwd_wti(s1, r['F0'], c, T)*c['S2_0']
+        vF = fwd_fx(s2, r['G0'], r['NFX'], c, T)
+    else:
+        vW = np.where(r['alive'], np.maximum(s1-K, 0), 0.0)*c['barrels']*c['S2_0']
+        vF = np.maximum(s2-c['S2_0'], 0)*r['NFX']
     hF = hyp_fx(s1, s2, r['F0'], r['G0'], c, T)
     cfhrF = signed_lower_of(vF, hF)
 
@@ -114,6 +124,13 @@ def structures(npaths=200_000, seed=20260706, K=None, V_A0=17_448.76):
     # no barrier and keep hedging
     naked_A = c['barrels']*(s1[kom]*s2[kom] - r['s1_ko'][kom]*r['s2_ko'][kom])
     postko_var99_A = float(-np.percentile(naked_A, 1)) if kom.any() else 0.0
+    if legs == 'forwards':
+        naked_B = np.zeros_like(naked_A)          # neither leg carries a barrier
+    else:
+        b2_ko = np.maximum(r['s2_ko'][kom]-c['S2_0'], 0)*r['NFX']
+        b2_T = np.maximum(s2[kom]-c['S2_0'], 0)*r['NFX']
+        naked_B = naked_A - (b2_T - b2_ko)         # B2 survives the touch
+    postko_var99_B = float(-np.percentile(naked_B, 1)) if kom.any() else 0.0
 
     # Structure A: one combined instrument, floating S2(T) inside the payoff
     A_val = np.where(r['alive'], np.maximum(s1-K, 0)*s2, 0.0)*c['barrels']
@@ -144,7 +161,7 @@ def structures(npaths=200_000, seed=20260706, K=None, V_A0=17_448.76):
         B_carry_sd=float(B['carry'].std(ddof=1)), B_cfhr_sd=float(B['cfhr'].std(ddof=1)),
         A_mean_ineff=float(ineff_A.mean()), A_carry_sd=float(np.abs(A_val).std(ddof=1)),
         A_var99=float(-np.percentile(E_A, 1)), B_var99=float(-np.percentile(E_B, 1)),
-        postko_naked_var99_A=postko_var99_A, postko_naked_var99_B=0.0,
+        postko_naked_var99_A=postko_var99_A, postko_naked_var99_B=postko_var99_B,
         B_mean_ineff=float(B['ineff'].mean()),
         post_ko_mean=float(B['post_ko_pl'].mean()) if kom.any() else 0.0,
         post_ko_sd=float(B['post_ko_pl'].std(ddof=1)) if kom.sum() > 1 else 0.0,
@@ -155,9 +172,10 @@ def structures(npaths=200_000, seed=20260706, K=None, V_A0=17_448.76):
 
 if __name__ == '__main__':
     n = int(sys.argv[1]) if len(sys.argv) > 1 else 200_000
-    r = structures(npaths=n)
+    legs = sys.argv[2] if len(sys.argv) > 2 else 'options'
+    r = structures(npaths=n, legs=legs)
     bn = lambda x: x/1e9
-    print(f"{n:,} physical-measure paths, asymmetric up/down jump calibration")
+    print(f"{n:,} physical-measure paths, asymmetric up/down jump calibration, B legs = {legs}")
     print(f"  barrier touch rate                      {r['ko_rate']:.4f}")
     print(f"  unhedged physical exposure std          {bn(r['sigma_phys']):10,.2f} bn")
     print(f"  sigma_econ  A                           {bn(r['sigma_econ_A']):10,.2f} bn")
