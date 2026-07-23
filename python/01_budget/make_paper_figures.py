@@ -225,7 +225,10 @@ SIGV = V2['sigV']
 
 rmA = R['AM']['risk_min']
 p = np.linspace(0, 0.9, 721)
-min_cost = (K1A + p*M1 + M2) / 1e9                       # cheapest attainable, pure KO
+# cheapest attainable, pure KO: the (1,0) branch is only the minimiser while the
+# coefficient on w1 is negative; past p_dagger the minimiser moves to (0,0)
+p_dag = 1 - K1A/M1
+min_cost = np.where(p < p_dag, (K1A + p*M1 + M2), (M1 + M2)) / 1e9
 adopted = (K1A*rmA['w1'] + K2A*rmA['w2']
            + (1-rmA['w1']*(1-p))*M1 + (1-rmA['w2']*(1-p))*M2) / 1e9
 # mixed-program optimum ledger: floor-point cost while unconstrained, then
@@ -241,7 +244,7 @@ fig, ax = plt.subplots(figsize=(7.2, 4.2))
 ax.plot(p, adopted, color='black', lw=1.3,
         label='pure-KO book, adopted allocation')
 ax.plot(p, min_cost, color='0.45', lw=1.3, ls='--',
-        label='pure-KO book, minimum attainable')
+        label='pure-KO book, minimum attainable (branch-correct)')
 ax.plot(p, mixed, color='black', lw=2.0, ls='-.',
         marker='o', ms=5, markevery=60, markerfacecolor='white',
         markeredgecolor='black', markeredgewidth=1.1,
