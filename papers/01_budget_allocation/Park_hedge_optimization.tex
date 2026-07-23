@@ -93,6 +93,10 @@ The allocation program imposes exactly four constraints:
 \end{equation}
 with $C$ equal to \eqref{eq:costeu} or \eqref{eq:costam}.
 
+\paragraph{What $B$ actually caps.} One point must be made before any result is read, because the paper's earlier drafts described the constraint incorrectly. $C(w_1,w_2)$ in \eqref{eq:constraints} is not cash paid at inception. It is the sum of the option premium, which is cash, and the stress-scenario loss on the unhedged fraction, which is a contingent outcome under one scenario. At the European risk-minimising vertex the two components are KRW 40.45bn of premium and KRW 4.55bn of stress loss, summing to the KRW 45bn cap. Under a cap on \emph{premium alone} the same allocation spends 40.45bn, the unconstrained line optimum $(0.9660,\,0.0340)$ spends 40.33bn, and the cap binds in neither regime.
+
+The vertex result of Section~\ref{sec:binding} is therefore a statement about a combined spend-plus-stress ledger and not about a cash authority, and the reader should hold that distinction throughout. A treasury whose 45bn authority governs cash outlay only would find both regimes interior and the allocation pinned by \eqref{eq:linegmvp} alone, which is the American answer $(0.9660,\,0.0340)$ in both cases. The paper reports the combined-ledger program because that is what makes the two regimes' stress exposure comparable on one axis, but the ``budget binds'' language of question~(a) applies to that ledger and not to a premium budget.
+
 The allocation constraint $w_1+w_2\le1$ deserves more than a passing note, because the paper's central asymmetry result is derived on the line it defines. Its economic content is that the two legs are denominated against \emph{the same} exposure. At the spot rate of Table~\ref{tab:inputs} the monthly barrel requirement and the monthly dollar requirement are the same quantity of money,
 \begin{equation}
 Q_{oil}\cdot S_{WTI} \;=\; 2{,}000{,}000 \times 78.94 \;=\; \$157{,}880{,}000 \;=\; Q_{USD},
@@ -317,12 +321,19 @@ where $UL_{WTI}=Q_{oil}\max(0,S^{st}_{WTI}-S_{WTI})\,S^{st}_{KRW}$ and $UL_{FX}=
 
 Figure \ref{fig:pko} traces \eqref{eq:sadj} in $p_{KO}$, both at the adopted risk-minimizing allocation and minimized over all feasible $(w_1,w_2)$. Two structural facts emerge.
 
-\emph{The budget is breached at $p_{KO}^* = 10.91\%$.} The cheapest attainable stress-adjusted cost is $\min_{(w_1,w_2)}\widetilde C^{AM} = C^{AM}(1,0) + p_{KO}\,UL_{WTI}$, which crosses the KRW 45bn cap at
+\emph{The budget is breached at $p_{KO}^* = 10.91\%$.} While $\partial\widetilde C^{AM}/\partial w_1<0$ the cheapest attainable stress-adjusted cost is $\min_{(w_1,w_2)}\widetilde C^{AM} = C^{AM}(1,0) + p_{KO}\,UL_{WTI}$, which crosses the KRW 45bn cap at
 \begin{equation}
 p_{KO}^* \;=\; \frac{B - C^{AM}(1,0)}{UL_{WTI}} \;=\; \frac{45{,}000{,}000{,}000 - 33{,}477{,}827{,}504}{105{,}586{,}000{,}000} \;=\; 0.1091.
 \label{eq:pstar}
 \end{equation}
 Beyond a $10.9\%$ stress knock-out probability, \emph{no allocation whatsoever} keeps stress-adjusted cost within the budget: the term $p_{KO}\cdot UL_{WTI}$ is a loss floor that no choice of $(w_1,w_2)$ can hedge away, because the instrument that would hedge it is the instrument that is dying.
+
+That formula is valid only while the coefficient on $w_1$ in $\widetilde C^{AM}$ is negative, that is while $Q_{oil}P^{Sh}_{WTI}e^{r_wT_1}<(1-p_{KO})\,UL_{WTI}$. The coefficient changes sign at
+\begin{equation}
+p_{KO}^{\dagger} \;=\; 1-\frac{Q_{oil}\,P^{Sh}_{WTI}\,e^{r_wT_1}}{UL_{WTI}} \;=\; 0.6969,
+\label{eq:pdagger}
+\end{equation}
+above which buying WTI coverage no longer pays for itself against the survival-adjusted stress loss and the unconstrained minimiser moves from $(1,0)$ to $(0,0)$, where the ledger reads $UL_{WTI}+UL_{FX}=$ KRW 107.06bn. Since $p_{KO}^*=0.1091$ lies well below $p_{KO}^{\dagger}$, the threshold itself is unaffected. The measured stress mortality of $0.8925$, however, lies \emph{above} $p_{KO}^{\dagger}$, so the ``cheapest attainable'' curve plotted in Figure~\ref{fig:pko} and the figure of KRW 127.72bn quoted for it are the $(1,0)$ branch extended past its own validity range; the correct minimum at the measured mortality is KRW 107.06bn. Nothing downstream turns on this, because the comparison that matters is between the adopted all-KO ledger (KRW 127.15bn) and the KRW 45bn authority, and both the incorrect and the corrected minimum exceed the authority by a wide margin. The correction is recorded because the figure as printed is a minimum that a feasible point undercuts.
 
 \emph{Measuring $p_{KO}$: conditioning is everything.} The structure's unconditional knock-out statistics ($23.09\%$ net of early exercise, $45.1\%$ by raw barrier touch under exact first-passage monitoring) already sit two to four times above $p_{KO}^*$, but they are the wrong numbers for the stress ledger: they average over paths launched from the calm spot of $78.94$, most of which never approach the barrier. The number the ledger needs is conditional on the stress state itself. Re-simulating the calibrated jump-diffusion of Section 5 from $S_{WTI}=113$ (only $6.2\%$ below the 120 barrier, with $32.4\%$ diffusive volatility, $6.8$ jumps per year and $0.833$ years still to run) gives
 \begin{equation}
