@@ -17,11 +17,12 @@ for the notes. This is exactly the split the paper flags: the structured
 denominators are easy and reproducible; the notes-level outcomes are the
 labour-intensive remaining step.
 """
+import os
 import json, time, io, zipfile
 import urllib.request, urllib.parse
 import xml.etree.ElementTree as ET
 
-KEY = "REDACTED_OPENDART_KEY"
+KEY = os.environ.get("OPENDART_API_KEY") or open(os.path.expanduser("~/.opendart_key")).read().strip()
 BASE = "https://opendart.fss.or.kr/api"
 
 # --- target sample: the paper's commodity-exposed sectors + broad/FX panel ---

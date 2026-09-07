@@ -8,10 +8,11 @@ document.xml. This probes a few firms, downloads the actual annual-report
 document, and searches the raw text for derivative / hedge keywords to
 prove the data is reachable -- and to measure, honestly, how clean it is.
 """
+import os
 import json, io, zipfile, re, time
 import urllib.request, urllib.parse
 
-KEY = "REDACTED_OPENDART_KEY"
+KEY = os.environ.get("OPENDART_API_KEY") or open(os.path.expanduser("~/.opendart_key")).read().strip()
 BASE = "https://opendart.fss.or.kr/api"
 
 PROBE = {           # corp_code : (name, filing-search window for FY2023 annual report)

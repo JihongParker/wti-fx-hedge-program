@@ -18,10 +18,11 @@ This is the "remaining 30%" done for real on the pilot: it turns the
 reachable notes (notes_probe) into measured variables, and documents,
 firm by firm, exactly how clean each field is.
 """
+import os
 import json, io, zipfile, re, time
 import urllib.request
 
-KEY = "REDACTED_OPENDART_KEY"
+KEY = os.environ.get("OPENDART_API_KEY") or open(os.path.expanduser("~/.opendart_key")).read().strip()
 BASE = "https://opendart.fss.or.kr/api"
 
 # strict, multi-word derivative instrument names only (bare 선도/선물/옵션/swap are

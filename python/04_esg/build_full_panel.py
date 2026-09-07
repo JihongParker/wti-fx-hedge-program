@@ -11,12 +11,13 @@ For every sampled firm x fiscal year 2017–2024:
 Checkpointed: appends one JSON line per firm-year to panel.jsonl and skips
 rows already present, so the run is resumable.
 """
+import os
 import json, os, re, time
 import urllib.request
 
 from derivative_parser import fetch_doc, designation_status  # validated parser
 
-KEY = "REDACTED_OPENDART_KEY"
+KEY = os.environ.get("OPENDART_API_KEY") or open(os.path.expanduser("~/.opendart_key")).read().strip()
 BASE = "https://opendart.fss.or.kr/api"
 YEARS = list(range(2016, 2025))          # fiscal years; report filed year+1
 DERIV_KW = ["통화선도", "통화스왑", "이자율스왑", "통화옵션", "선물환", "상품스왑", "원자재스왑"]

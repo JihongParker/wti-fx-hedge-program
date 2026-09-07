@@ -10,11 +10,12 @@ Assignment uses FY2018 assets only (intention-to-treat; avoids endogenous
 threshold crossing). Financial firms (KSIC 64-66) excluded.
 Output: sample.json
 """
+import os
 import json, time, random
 import urllib.request
 import xml.etree.ElementTree as ET
 
-KEY = "REDACTED_OPENDART_KEY"
+KEY = os.environ.get("OPENDART_API_KEY") or open(os.path.expanduser("~/.opendart_key")).read().strip()
 BASE = "https://opendart.fss.or.kr/api"
 TARGET = {"2019": 100, "2022": 80, "2024": 70, "inf": 150}
 random.seed(20260713)
