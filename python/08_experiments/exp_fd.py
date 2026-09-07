@@ -1,5 +1,5 @@
 import sys, numpy as np
-sys.path.insert(0,'/Users/elijahjasper/Modeling/python/00_engine')
+sys.path.insert(0,'/Users/elijahjasper/1-Projects/13-Papers/python/00_engine')
 from lsmc_quanto import price, CAL
 from delta_hedge import fit_surface, surface_delta
 
@@ -7,8 +7,8 @@ S=CAL['S1_0']; S20=CAL['S2_0']
 for eps in (0.01,0.05):
     est=[]
     for sd in (11,22,33,44,55):
-        up,_=price(npaths=100_000, seed=sd, S1_0=S*(1+eps))
-        dn,_=price(npaths=100_000, seed=sd, S1_0=S*(1-eps))
+        up,_=price(npaths=100_000, seed=sd, S1_0=S*(1+eps), K=S)
+        dn,_=price(npaths=100_000, seed=sd, S1_0=S*(1-eps), K=S)
         est.append((up-dn)/(2*S*eps)/S20)
     e=np.array(est)
     print(f"FD delta eps={eps}: mean {e.mean():.4f}  sd across seeds {e.std(ddof=1):.4f}  range [{e.min():.4f},{e.max():.4f}]")

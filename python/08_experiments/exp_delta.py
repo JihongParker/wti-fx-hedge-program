@@ -1,5 +1,5 @@
 import sys, numpy as np
-sys.path.insert(0,'/Users/elijahjasper/Modeling/python/00_engine')
+sys.path.insert(0,'/Users/elijahjasper/1-Projects/13-Papers/python/00_engine')
 from delta_hedge import fit_surface, surface_delta
 from lsmc_quanto import price, CAL
 
@@ -12,8 +12,8 @@ def reg_delta_at(tfrac, npaths, seed=12345):
 
 def fd_delta(npaths, seed=12345, eps=0.01):
     S=CAL['S1_0']
-    up,_=price(npaths=npaths, seed=seed, S1_0=S*(1+eps))
-    dn,_=price(npaths=npaths, seed=seed, S1_0=S*(1-eps))
+    up,_=price(npaths=npaths, seed=seed, S1_0=S*(1+eps), K=S)
+    dn,_=price(npaths=npaths, seed=seed, S1_0=S*(1-eps), K=S)
     return (up-dn)/(2*S*eps)/CAL['S2_0']
 
 print(f"{'paths':>9} {'price':>12} {'reg delta(0)':>13} {'FD delta(0)':>12} {'gap %':>8}")
